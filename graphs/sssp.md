@@ -7,6 +7,8 @@
 ## Dijkastra Algorithm
 
 1. Can only be used to solve the “single source shortest path” problem in a graph with non-negative weights.
+2. “Dijkstra's Algorithm” uses a “greedy approach”.
+3. Each step selects the “minimum weight” from the currently reached vertices to find the “shortest path” to other vertices.
 
 ## Bellman-Ford Algorithm
 
