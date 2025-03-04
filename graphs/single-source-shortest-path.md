@@ -17,25 +17,26 @@
 ```
    class Solution {
     public : 
-    vector<int> dijkastra(int n, vector<vector<int>> adj[], int source) {
+    vector<int> dijkastra(int n, vector<vector<int>> adj[], int src) {
         
-        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>> pq;
-        vector<int> dist(V, 1e9);
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>> minHeap;
+        vector<int> minDistance(V, 1e9);
         
-        dist[source] = 0;
-        pq.push({0, source});
+        minDistance[src] = 0;
+        minHeap.push({0, src});
         
-        while(!pq.empty()) {
-            int dis = pq.top().first;
-            int node = pq.top().second;
-            pq.pop();
+        while(!minHeap.empty()) {
+            int dis = minHeap.top().first;
+            int node = minHeap.top().second;
+            minHeap.pop();
             
             for (auto it : adj[node]) {
                 int adjNode = it[0];
                 int edgeWt = it[1];
-                if (dis + edgeWt < dist[adjNode]) {
-                    dist[adjNode] = dis + edgeWt;
-                    pq.push({dist[adjNode], adjNode});
+                int newDistance = dis + edgeWt;
+                if (newDistance < minDistance[adjNode]) {
+                    minDistance[adjNode] = newDistance;
+                    minHeap.push({newDistance, adjNode});
                 }
             }
         }
