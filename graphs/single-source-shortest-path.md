@@ -14,6 +14,36 @@
 6. With the visited array, we ensure that a node is processed exactly once, but it increases memory usage. Without the visited array, it's possible that the same node could be stored in the priority queue, but if the same node with a smaller distance already exists, it will be processed first.
 7. Code References : https://leetcode.com/discuss/interview-question/6131652/Dijkstra%27s-Algorithm-or-All-3-Implementations-or-Readable-C%2B%2B-Code
 
+```
+   class Solution {
+    public : 
+    vector<int> dijkastra(int n, vector<vector<int>> adj[], int source) {
+        
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>> pq;
+        vector<int> dist(V, 1e9);
+        
+        dist[source] = 0;
+        pq.push({0, source});
+        
+        while(!pq.empty()) {
+            int dis = pq.top().first;
+            int node = pq.top().second;
+            pq.pop();
+            
+            for (auto it : adj[node]) {
+                int adjNode = it[0];
+                int edgeWt = it[1];
+                if (dis + edgeWt < dist[adjNode]) {
+                    dist[adjNode] = dis + edgeWt;
+                    pq.push({dist[adjNode], adjNode});
+                }
+            }
+        }
+        return dist;
+    }
+}
+```
+
 ## Bellman-Ford Algorithm
 
 1. Can solve the “single-source shortest path” in a weighted directed graph with any weights, including, of course, negative weights.
