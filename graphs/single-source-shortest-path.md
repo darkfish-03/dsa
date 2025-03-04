@@ -48,14 +48,6 @@
 }
 
 Time Complexity Analysis :
-
-O(V*(pop vertex from minHeap + no. of edges on each vertex*push into minHeap))
-O(V*(log(minHeapSize) + ne(log(minHeapSize)))
-O(V*(log(minHeapSize))(ne + 1))
-O(V*(log(minHeapSize))*V)
-O(V^2*(log(minHeapSize)))
-O(E*(log(V)))
-
 >> O((V+E)log(V))
 
 ```
