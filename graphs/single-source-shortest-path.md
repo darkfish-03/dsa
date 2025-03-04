@@ -30,6 +30,7 @@
             int dis = minHeap.top().first;
             int node = minHeap.top().second;
             minHeap.pop();
+            if (dis > minDistance[node]) continue;
             
             for (auto it : adj[node]) {
                 int adjNode = it[0];
