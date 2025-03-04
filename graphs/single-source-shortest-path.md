@@ -54,6 +54,9 @@ O(V*(log(minHeapSize))(ne + 1))
 O(V*(log(minHeapSize))*V)
 O(V^2*(log(minHeapSize)))
 O(E*(log(V)))
+
+>> O((V+E)log(V))
+
 ```
 
 ## Bellman-Ford Algorithm
