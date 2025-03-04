@@ -13,7 +13,8 @@
 5. Intuition : https://leetcode.com/discuss/general-discussion/1059477/A-noob%27s-guide-to-Djikstra%27s-Algorithm
 6. With the visited array, we ensure that a node is processed exactly once, but it increases memory usage. Without the visited array, it's possible that the same node could be stored in the priority queue, but if the same node with a smaller distance already exists, it will be processed first.
 7. Code References : https://leetcode.com/discuss/interview-question/6131652/Dijkstra%27s-Algorithm-or-All-3-Implementations-or-Readable-C%2B%2B-Code
-8. If there is an edge with negative weight then dijkastra alg will keep oscillating between the nodes. 
+8. If there is an edge with negative weight then dijkastra alg will keep oscillating between the nodes.
+9. Set can also be used as it provides same properties (ascending order, fast retrieval and insertions) as that of priority queue. With set we can erase middle entries which is not possible with priority queue. 
 
 ```
    class Solution {
