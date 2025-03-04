@@ -60,5 +60,39 @@ Time Complexity :
 ## Bellman-Ford Algorithm
 
 1. Can solve the “single-source shortest path” in a weighted directed graph with any weights, including, of course, negative weights.
+2. Can be used to detect negative cycles as well.
+3. Edges can be processed in any order.
+4. Relax all the edges n-1 times sequentially.
+5. Why n-1 iterations ? Consider 1 --> 2 --> 3 --> 4 --> 5 and let say we process edges from (4,5), (4,3), (3,2), (2,1), then we will need n-1 edges.
+6. If on nth iteration the min distance for any node gets relaxed, then it implies that graph contains negative cycle.
+7. After the execution of  $i_{th}$  phase, the Bellman-Ford algorithm correctly finds all shortest paths whose number of edges does not exceed  $i$
+8. Any shortest path cannot have more than  $n - 1$  edges.
+
+```
+class Solution {
+    public :
+    vector<int> bellmanford(int v, vector<vector<int>>& edges, int src) {
+        vector<int> minDistance(V, 1e9);
+        minDistance[src] = 0;
+        
+        for (int i = 0;i<V-1;i++) {
+            for (auto& it : edges) {
+                int u = it[0]; int v = it[1]; int wt = it[2];
+                if (minDistance[u] != 1e9 && minDistance[u] + wt < minDistance[v]) {
+                    minDistance[v] = minDistance[u] + wt;
+                }
+            }
+        }
+        
+        for (auto& it : edges) {
+                int u = it[0]; int v = it[1]; int wt = it[2];
+                if (minDistance[u] != 1e9 && minDistance[u] + wt < minDistance[v]) {
+                    return {-1};
+                }
+            }
+        return minDistance;
+    }
+}
+```
 
 ## Floyd-Warshall Algorithm
