@@ -41,7 +41,7 @@
                 }
             }
         }
-        return dist;
+        return minDistance;
     }
 }
 
