@@ -93,6 +93,64 @@ class Solution {
         return minDistance;
     }
 }
+
+Time Complexity :
+>> O(V*E)
+
 ```
 
 ## Floyd-Warshall Algorithm
+
+1. Multi Source Shortest Path Algorithm.
+2. Can be used to detect negative cycles as well.
+3. Try path via every vertex for given (u, v). min(d[u][k] + d[k][v])
+4. Its a dynamic programming solution.
+5. Solved using adjacency matrix.
+6. Before  $k$ -th phase ( $k = 1 \dots n$ ),  $d[i][j]$  for any vertices  $i$  and  $j$  stores the length of the shortest path between the vertex  $i$  and vertex  $j$ , which contains only the vertices  $\{1, 2, ..., k-1\}$  as internal vertices in the path.
+
+```
+class Solution {  
+    public :
+    vector<vector<int>> floydwarshall(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        
+        for (int i = 0;i<n;i++) {
+            for (int j = 0;j<n;j++) {
+                if (matrix[i][j] == -1) {
+                    matrix[i][j] = 1e9;
+                }
+                if (i == j) {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+        
+        for (int k = 0;k<n;k++) {
+            for (int i = 0;i<n;i++) {
+                for (int j = 0;j<n;j++) {
+                    matrix[i][j] = min(matrix[i][j], matrix[i][k]+matrix[k][j]);
+                }
+            }
+        }
+        
+        for (int i = 0;i<n;i++) {
+            if (matrix[i][i] < 0) {
+                // negative cycle
+            }
+        }
+        
+        for (int i = 0;i<n;i++) {
+            for (int j = 0;j<n;j++) {
+                if (matrix[i][j] == 1e9) {
+                    matrix[i][j] = -1;
+                }
+            }
+        }
+        return matrix;
+    }
+}
+
+Time Complexity :
+>> O(V^3)
+
+```
