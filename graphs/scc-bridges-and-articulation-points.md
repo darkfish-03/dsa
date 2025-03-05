@@ -67,6 +67,47 @@ dfs(0, -1);
 ## Articulation Point
 
 1. An articulation point or cut vertex is a vertex which when removed makes graph disconneted or in other words increases the number of connected components.
-2. Not all the endpoints of bridge are articulation points.
+2. Not all the endpoints of bridge are articulation points. Only nodes with indegree >=1 would be articulation points. 
 3. Articulation points can also exist without existence of bridges (eg *). Hence, finding bridge algorithm cannot be reused for articulation points.
-4. 
+4. Root node requires special handling as it may or may not be articulation point.
+5. Since same node can be detected as articulation point by different subtree, that's why use a set. 
+
+```
+int n; // number of nodes
+vector<vector<int>> adj; // adjacency list of graph
+
+vector<bool> visited;
+vector<int> tin, low;
+int timer;
+
+void dfs(int v, int p = -1) {
+    visited[v] = true;
+    tin[v] = low[v] = timer++;
+    int children=0;
+    for (int to : adj[v]) {
+        if (to == p) continue;
+        if (visited[to]) {
+            low[v] = min(low[v], tin[to]);
+        } else {
+            dfs(to, v);
+            low[v] = min(low[v], low[to]);
+            if (low[to] >= tin[v] && p!=-1)
+                IS_CUTPOINT(v);
+            ++children;
+        }
+    }
+    if(p == -1 && children > 1)
+        IS_CUTPOINT(v);
+}
+
+void find_cutpoints() {
+    timer = 0;
+    visited.assign(n, false);
+    tin.assign(n, -1);
+    low.assign(n, -1);
+    for (int i = 0; i < n; ++i) {
+        if (!visited[i])
+            dfs (i);
+    }
+}
+```
