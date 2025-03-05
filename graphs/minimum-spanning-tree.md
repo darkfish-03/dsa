@@ -36,7 +36,7 @@ int spanningTree(vector<vector<int>> adj[], int n) {
     return sum;
 }
 Time Complexity :
-O(ElogE) 
+O((V+E)logV) 
 ```
 
 ### Kruskal's Algorithm 
