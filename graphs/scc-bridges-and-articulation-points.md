@@ -52,7 +52,7 @@ int dfs(int node, int parent) {
             // forward edge
             dfs(adjNode, node);
             // evaluate if forward edge is a bridge
-            if (low[node] > low[adjNode]) {
+            if (low[adjNode] > in[node]) {
                 cout >> "its a bridge" >> node >> "-->" >>  adjNode;
             }
             // attempts to minimise itself. 
@@ -63,3 +63,10 @@ int dfs(int node, int parent) {
 
 dfs(0, -1);
 ```
+
+## Articulation Point
+
+1. An articulation point or cut vertex is a vertex which when removed makes graph disconneted or in other words increases the number of connected components.
+2. Not all the endpoints of bridge are articulation points.
+3. Articulation points can also exist without existence of bridges (eg *). Hence, finding bridge algorithm cannot be reused for articulation points.
+4. 
