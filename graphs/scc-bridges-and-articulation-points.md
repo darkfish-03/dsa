@@ -27,4 +27,4 @@ bool dfs(int v) {
 
 1. A bridge is an edge in a graph which when removed makes graph disconneted or in other words increases the number of connected components.
 2. During a DFS traversal there are certain edges which are traversed referred as forward edges and edges which are not traversed are called back edges. 
-The backedges can never be bridges. 
+The backedges can never be bridges. Backedges results in cycle.
