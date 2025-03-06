@@ -42,3 +42,39 @@ class Solution {
     }
 }
 ```
+
+DFS 
+
+```
+class Solution {
+    
+    private :
+     bool dfs(int start, int col, vector<int> adj[], vector<int> & color) {
+        color[start] = col;
+        
+        for (int adjNode : adj[start]) {
+            if (color[adj] == -1) {
+                if (!dfs(adjNode, !col, adj, color)) {
+                    return false;
+                }
+            } else if (color[adjNode] == color[node]) {
+                return false;
+            }
+        }
+        return true;
+     }
+    
+    
+    public :
+    bool isBipartite(int n, vector<int> adj[]) {
+        vector<int> col(n, -1);
+        
+        for (int i = 0;i<n;i++) {
+            if (col[n] == -1) {
+                if (!dfs(i, 0, adj, col)) return false;
+            }
+        }
+        return true;
+    }
+}
+```
