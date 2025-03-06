@@ -87,3 +87,37 @@ Time Complexity :
 O(V + 2E)
 ```
 
+### DFS 
+
+```
+// DFS with timein and timeout & 3 states.
+
+vector<int> color;
+vector<int> time_in, time_out;
+int dfs_timer = 0;
+
+void dfs_colour(int v, vector<vector<int>> &g, vector<int> &component) {
+    color[v] = 1;
+    time_in[v] = dfs_timer++;
+    component.push_back(v);
+    for(int &u:g[v]) {
+        if(color[u] == 0) {
+            dfs_colour(u, g, component);
+        }
+    }
+    color[v] = 2;
+    time_out[v] = dfs_timer++;
+}
+
+int main() {
+    for(int i=0; i<n; ++i) {
+        vector<int> component;
+        if(color[i] == 0)  {
+            cc++;
+            dfs_colour(i, g, component);
+            components.push_back(component);
+        }
+    }
+}
+```
+
