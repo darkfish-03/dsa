@@ -97,7 +97,7 @@ vector<int> time_in, time_out;
 int dfs_timer = 0;
 
 void dfs_colour(int v, vector<vector<int>> &g, vector<int> &component) {
-    color[v] = 1;
+    color[v] = 1; // helps in cycle detection
     time_in[v] = dfs_timer++;
     component.push_back(v);
     for(int &u:g[v]) {
