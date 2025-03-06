@@ -54,12 +54,17 @@ class Solution {
 vector<bool> vis;
 bool dfs(vector<vector<int>> &g, int v, int p) {
     vis[v] = true;
+    temp.push_back(v);
     for(int &u:g[v]) {
         if(!vis[u]) {
             // If cycle is found anywhere, return true; Note that return(dfs(g,u,v)) is incorrect.
             if(dfs(g, u, v)) return true;
-        } else if(u != p) return true;
+        } else if(u != p)  {
+          temp.push_back(u);
+          return true;
+        }  
     }
+    temp.pop_back();
     return false;
 }
 bool isCycle(vector<vector<int>>& adj) {
@@ -73,3 +78,39 @@ bool isCycle(vector<vector<int>>& adj) {
 }
 ```
 ## Detect a cycle in directed graph 
+
+### BFS
+Use TopoSort
+
+### DFS 
+
+```
+// There can be multiple sources to reach a vertex. In undirected, we can explore the completed connected component at once
+// We can use color algorithm in this case
+
+3 ---* 4
+|      |
+|      |
+*      *
+5 ---* 6
+
+vector<int> color, parent;
+int cycle_start, cycle_end;
+bool dfs(vector<vector<int>> &g, int v) {
+    color[v] = 1;
+    for(int &u:g[v]) {
+        if(color[u] == 0) {
+            parent[u] = v;
+            if(dfs(g, u)) return true;
+        }
+        // Note that if a node is already completed it's dfs, it's not a part of cycle. 
+        else if(color[u] == 1) {
+            cycle_start = u;
+            cycle_end = v;
+            return true;
+        }
+    }
+    color[v] = 2;
+    return false;
+}
+```
