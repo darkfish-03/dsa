@@ -48,4 +48,28 @@ class Solution {
 };
 ```
 
+DFS 
+
+```
+vector<bool> vis;
+bool dfs(vector<vector<int>> &g, int v, int p) {
+    vis[v] = true;
+    for(int &u:g[v]) {
+        if(!vis[u]) {
+            // If cycle is found anywhere, return true; Note that return(dfs(g,u,v)) is incorrect.
+            if(dfs(g, u, v)) return true;
+        } else if(u != p) return true;
+    }
+    return false;
+}
+bool isCycle(vector<vector<int>>& adj) {
+    int n = adj.size();
+    vis.resize(n, 0);
+    bool ans = false;
+    for(int i=0; i<n; i++) {
+        if(!vis[i]) ans |= dfs(adj, i, -1);
+    }
+    return ans;
+}
+```
 
