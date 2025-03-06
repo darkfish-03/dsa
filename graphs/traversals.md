@@ -26,6 +26,7 @@ int main() {
    int n, m; // n nodes, m edges
    cin >> n >> m;
    vector<int> adj[n+1];
+   // vector< pair <int,int> > adjList[n+1]; for weighted graph
    
    for (int i = 0;i<m; i++) {
        int u, v;
