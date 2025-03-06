@@ -48,7 +48,7 @@ class Solution {
 };
 ```
 
-DFS 
+## DFS 
 
 ```
 vector<bool> vis;
@@ -72,4 +72,4 @@ bool isCycle(vector<vector<int>>& adj) {
     return ans;
 }
 ```
-
+## Detect a cycle in directed graph 
