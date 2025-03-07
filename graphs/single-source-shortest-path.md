@@ -1,6 +1,6 @@
 # Single Source Shortest Path
 
-## BFS/ DFS
+## BFS
 
 1. Can only solve the “shortest path” problem in “unweighted graphs”.
 
@@ -27,6 +27,7 @@ void bfs(int src, vector<vector<int>>& adj, vector<int>& vis, vector<int>& dis) 
 }
 
 ```
+DFS can be used for SSSP on tree only. 
 
 ## Dijkastra Algorithm
 
