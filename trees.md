@@ -7,3 +7,19 @@
 5. Run a dfs from x and find the maximum distance from this node to any other node, i.e the diameter of tree.
 
 Problem Set : https://www.spoj.com/problems/PT07Z/
+
+### Subtree Size 
+
+```
+int dfs(int src) {
+    vis[src] = 1;
+    int curr_size = 1;
+
+    for (int adjNode : adj[src)) {
+        if (vis[adjNode] == 0) {
+           curr_size += dfs(adjNode);
+    }
+    subTreeSize[node] = curr_size;
+    return curr_size;
+}
+```
