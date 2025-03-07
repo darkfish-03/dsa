@@ -31,7 +31,7 @@ void bfs(int src, vector<vector<int>>& adj, vector<int>& vis, vector<int>& dis) 
 Problems : 
 
 1. https://www.spoj.com/problems/PPATH/ -- > https://leetcode.com/playground/JKXDQFwN
-2. https://www.hackerearth.com/practice/algorithms/graphs/depth-first-search/practice-problems/algorithm/feasible-relations/
+
 
 DFS can be used for SSSP on tree only. 
 
