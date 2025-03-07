@@ -125,3 +125,7 @@ O(V + 2E)
 
 ```
 
+Problems
+
+1. https://www.hackerearth.com/practice/algorithms/graphs/depth-first-search/practice-problems/algorithm/feasible-relations/
+
