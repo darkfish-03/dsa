@@ -37,3 +37,32 @@ int main() {
     dfs(1, 1);
 }
 ```
+
+### BFS
+
+```
+void bfs(int x, int y, vector<vector<int>>& vis, vector<int>& dis) {
+    queue<pair<int, int>> q;
+    vis[x][y] = 1;
+    dis[x][y] = 1;
+    
+    q.push({x, y});
+    
+    while(!q.empty()) {
+        int curr_x = q.front().first;
+        int curr_y = q.front().second;
+        q.pop();
+        
+        for (int i = 0; i<4; i++) {
+            int new_x = curr_x + dx[i];
+            int new_y = curr_y + dy[i];
+            
+            if (isValid(new_x, new_y) {
+                vis[new_x][new_y] = 1;
+                dis[new_x][new_y] = dis[curr_x][curr_y] + 1;
+                q.push({new_x, new_y});
+            }
+        }
+    }
+}
+```
