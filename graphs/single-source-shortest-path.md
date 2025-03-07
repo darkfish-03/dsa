@@ -27,6 +27,9 @@ void bfs(int src, vector<vector<int>>& adj, vector<int>& vis, vector<int>& dis) 
 }
 
 ```
+Problems : 
+https://www.spoj.com/problems/PPATH/ -- > https://leetcode.com/playground/JKXDQFwN
+
 DFS can be used for SSSP on tree only. 
 
 ## Dijkastra Algorithm
