@@ -2,7 +2,31 @@
 
 ## BFS/ DFS
 
-1. Can only solve the “shortest path” problem in “unweighted graphs”. In real scenario a shortest distance path might be more time consuming. 
+1. Can only solve the “shortest path” problem in “unweighted graphs”.
+
+```
+void bfs(int src, vector<vector<int>>& adj, vector<int>& vis, vector<int>& dis) {
+    queue<int> q;
+    vis[src] = 1;
+    dis[src] = 0;
+    
+    q.push(src);
+    
+    while(!q.empty()) {
+        int curr = q.front();
+        q.pop();
+        
+        for (int adjNode : adj[curr]) {
+            if (!vis[adjNode]) {
+                vis[adjNode] = 1;
+                dis[adjNode] = dis[curr] + 1;
+                q.push(adjNode);
+            }
+        }
+    }
+}
+
+```
 
 ## Dijkastra Algorithm
 
