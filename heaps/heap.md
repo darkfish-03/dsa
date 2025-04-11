@@ -48,6 +48,8 @@ A leaf node always follows the heap property since we have no left/ right subtre
 
 The process of rearranging the heap by comparing each parent with its children recursively is known as heapify. 
 
+This process can be applied if left and right subtree is already heapified for a given node. 
+
 ```
 void max_heapify (int Arr[ ], int i, int N)
 {
