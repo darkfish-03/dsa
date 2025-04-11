@@ -83,8 +83,9 @@ void build_maxheap (int Arr[ ])
     max_heapify (Arr, i);
 }
 
-O(N). max_heapify function has complexity log N and the build_maxheap functions runs only N/2 times,
+TC : O(N). max_heapify function has complexity log N and the build_maxheap functions runs only N/2 times,
 but the amortized complexity for this function is actually linear.
+SC : O(logN)
 ```
 
 
