@@ -88,6 +88,89 @@ but the amortized complexity for this function is actually linear.
 SC : O(logN)
 ```
 
+------------------
+
+Extract Max
+
+a. Save the max value.
+b. Swap the last to root
+c. Remove last i.e decrease heapsize
+d. Heapify root
+
+```
+int extract_maximum (int Arr[ ])
+{
+    if(length == 0)
+    {
+cout<< “Can’t remove element as queue is empty”;
+        return -1;
+    }
+    int max = Arr[1];
+    Arr[1] = Arr[length];
+    length = length -1;
+    max_heapify(Arr, 1); // on root
+    return max;
+}
+```
+
+Increase Key 
+
+On increasing the value of a node in a maxHeap, a node may move up to maintain the maxHeap property. 
+
+a. Update the node value
+b. percolate up till - parent > currNode or currNode becomes root. 
+
+```
+void increase_key(int Arr[ ], int i, int key) {
+    if (key < Arr[i]) {
+        cout<<”New value is less than current value, can’t be inserted” <<endl;
+        return;
+    }
+    Arr[i] = key;
+    while(i > 0 && Arr[i] > Arr[i/2]) {
+        swap(Arr[i], Arr[i/2]);
+        i = i/2;
+    }
+}
+
+TC : O(logN)
+SC : O(1)
+```
+
+Increase Key 
+
+On decreasing the value of a node in a maxHeap, a node may move down to maintain the maxHeap property. 
+
+a. Update the node value
+b. percolate down
+
+```
+void increase_key(int Arr[ ], int i, int key) {
+    if (key > Arr[i]) {
+        cout<<”New value is greater than current value, can’t be inserted” <<endl;
+        return;
+    }
+    Arr[i] = key;
+    max_heapify(Arr, i)
+}
+
+TC : O(logN)
+SC : O(logN)
+```
+
+Insert Key 
+
+a. Update the node value
+b. percolate up
+
+```
+void insert_value (int Arr[ ], int val)
+{
+    length = length + 1;
+    Arr[ length ] = -1;  //assuming all the numbers greater than 0 are to be inserted in queue.
+    increase_val (Arr, length, val);
+}
+```
 
 
 
