@@ -196,3 +196,5 @@ void heap_sort(int Ar[ ])
     }
 }
 ```
+
+We can use priority queues in scheduling of jobs. When there are N jobs in queue, each having its own priority. If the job with maximum priority will be completed first and will be removed from the queue, we can use priority queue’s operation extract_maximum here. If at every instant we have to add a new job in the queue, we can use insert_value operation as it will insert the element in O(log N) and will also maintain the property of max heap. 
