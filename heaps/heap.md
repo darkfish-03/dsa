@@ -70,7 +70,20 @@ TC : O(logN)
 SC : O(logN)
 ```
 
+------------------
+Build Heap Algorithm
 
+```
+
+void build_maxheap (int Arr[ ]) 
+{
+    for( int i = N/2 ; i >= 1 ; i--)
+    max_heapify (Arr, i);
+}
+
+O(N). max_heapify function has complexity log N and the build_maxheap functions runs only N/2 times,
+but the amortized complexity for this function is actually linear.
+```
 
 
 
