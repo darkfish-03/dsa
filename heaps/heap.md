@@ -172,5 +172,19 @@ void insert_value (int Arr[ ], int val)
 }
 ```
 
+---------
+Heap Sort
 
-
+```
+void heap_sort(int Ar[ ])
+{
+    int heap_size = N;
+    build_maxheap(Arr);
+    for(int i = N-1; i>=1 ; i-- )
+    {
+        swap|(Arr[ 1 ], Arr[ i ]);
+        heap_size = heap_size-1;
+        max_heapify(Arr, 1, heap_size);
+    }
+}
+```
