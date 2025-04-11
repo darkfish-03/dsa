@@ -175,6 +175,14 @@ void insert_value (int Arr[ ], int val)
 ---------
 Heap Sort
 
+1) Initially we will build a max heap of elements in Arr.
+
+2) Now the root element that is Arr[ 1 ] contains maximum element of Arr. After that, we will exchange this element with the last element of Arr and will again build a max heap excluding the last element which is already in its correct position and will decrease the length of heap by one.
+
+3) We will repeat the step 2, until we get all the elements in their correct position.
+
+4) We will get a sorted array.
+
 ```
 void heap_sort(int Ar[ ])
 {
