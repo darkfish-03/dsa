@@ -44,6 +44,7 @@ int binarySearch(vector<int> a, int target, int low, int high) {
 
 1. Lower Bound = smallest index such that arr[ind] >= target
 2. Upper Bound = smallest index such that arr[ind] > target
+3. Search insert position, ceil is similar to finding lower bound
 
 ```
 int binarySearch(vector<int> a, int target) {
@@ -62,6 +63,24 @@ int binarySearch(vector<int> a, int target) {
 }
 ```
 
+## Floor in an array
+
+```
+int binarySearch(vector<int> a, int target) {
+  int low = 0;
+  int high = a.size()-1;
+  int ans = -1;
+  while(low <= high) {
+    int mid = low + (high - low)/2;
+    if(a[mid] <= target) {
+      ans = a[mid];
+      low = mid +1;
+    } else {
+      high = mid - 1;
+  }
+  return ans;
+}
+```
 
 
 
