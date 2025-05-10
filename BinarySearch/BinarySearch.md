@@ -178,3 +178,26 @@ int binarySearch(vector<int> a, int target) {
 
 ```
 
+## Find minimum in a rotated array
+
+
+```
+// unique elements 
+int binarySearch(vector<int> a, int target) {
+  int low = 0;
+  int high = a.size()-1;
+  int ans = INT_MAX;
+  while(low <= high) {
+    int mid = low + (high - low)/2;
+    if (a[low] <= a[mid]) { // left sorted
+      ans = min(ans, a[low]);
+      low = mid + 1;
+    } else { // right sorted
+      ans = min(ans, a[high]);
+      high = mid - 1;
+    }
+  }
+  return ans;
+}
+```
+
