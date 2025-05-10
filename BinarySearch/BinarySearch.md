@@ -111,10 +111,9 @@ int binarySearch(vector<int> a, int target) {
 
 ## Search in a rotated array
 
-1. First Occurrance  == lowerBound
-2. Last Occurance = upperBound -1 if lowerBound exists
 
 ```
+// unique elements 
 int binarySearch(vector<int> a, int target) {
   int low = 0;
   int high = a.size()-1;
@@ -140,5 +139,42 @@ int binarySearch(vector<int> a, int target) {
   }
   return -1;
 }
+
+// duplicate elements
+[3, 1, 2, 3, 3, 3, 3] : you can't tell which part is sorted
+ this can happen if arr[low] == arr[high] == arr[mid] --> trim the search space
+
+int binarySearch(vector<int> a, int target) {
+  int low = 0;
+  int high = a.size()-1;
+  int ans = -1;
+  while(low <= high) {
+    int mid = low + (high - low)/2;
+    if(a[mid] == target) {
+      return mid;
+    }
+    if (arr[low] == arr[mid] && arr[high] == arr[mid]) {
+        low++;
+        high--;
+        continue;
+    }
+    if (a[low] <= a[mid]) { // left sorted
+      if (target >= a[low] && target <= a[mid]) {
+          high = mid - 1;
+      } else {
+          low = mid + 1;
+      }
+    } else { // right sorted
+      if (target >= a[mid] && target <= a[high]) {
+          low = mid + 1;
+      } else {
+          high = mid - 1;
+      }
+    }
+  }
+  return -1;
+}
+
+
 ```
 
