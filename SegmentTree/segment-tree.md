@@ -1,3 +1,5 @@
+## Build & Query
+
 ```
 
 segment[4*N];
@@ -29,5 +31,26 @@ int query(int index, int low, int high, int l, int r) {
     return min(left, right);
 }
 
+
+```
+
+
+## Point Update 
+
+```
+
+void update(int index, int low, int high, int node, int val) {
+    if (low == high) {
+        segment[low] = val;
+        return;
+    }
+    int mid = low + high / 2;
+    if (node>=low && node <= mid) {
+        update(2*index+1, low, mid, node, val);
+    } else {
+        update(2*index+2, mid+1, high, node, val)
+    }
+    segment[index] = min(segment[2*index+1], segment[2*index+2]);
+}
 
 ```
