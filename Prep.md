@@ -1043,3 +1043,70 @@ int main() {
 }
 
 ```
+
+#include <iostream>
+#include <string>
+#include <unordered_map>
+#include <sstream>
+
+using namespace std;
+
+// Simple Decode: Handles hex and '+' for spaces
+string decode(string s) {
+    string res = "";
+    for (int i = 0; i < s.length(); i++) {
+        if (s[i] == '%' && i + 2 < s.length()) {
+            res += (char)stoi(s.substr(i + 1, 2), nullptr, 16);
+            i += 2;
+        } else if (s[i] == '+') {
+            res += ' ';
+        } else {
+            res += s[i];
+        }
+    }
+    return res;
+}
+
+Given a URL containing query parameters, extract all key-value pairs after the ? symbol.
+
+If a key has a single value, store it as a string.
+If a key appears multiple times, store its values as an array.
+If a key appears without an explicit value, store it as true.
+Decode special URL-encoded characters (e.g., %26 should be replaced with &, and %3D should be replaced with =).
+
+```
+void parseURL(string url) {
+    size_t qPos = url.find('?');
+    if (qPos == string::npos || qPos == url.length() - 1) {
+        cout << "Empty Map" << endl;
+        return;
+    }
+
+    unordered_map<string, string> result;
+    stringstream ss(url.substr(qPos + 1));
+    string segment;
+
+    while (getline(ss, segment, '&')) {
+        size_t eqPos = segment.find('=');
+        string key = decode(segment.substr(0, eqPos));
+        string val = (eqPos == string::npos) ? "" : decode(segment.substr(eqPos + 1));
+
+        // If key exists, append with a comma; otherwise, create it
+        if (result.count(key)) {
+            result[key] += ", " + val;
+        } else {
+            result[key] = val;
+        }
+    }
+
+    // Print the output
+    for (auto const& [k, v] : result) {
+        cout << k << " : " << (v == "" ? "true" : v) << endl;
+    }
+}
+
+int main() {
+    parseURL("http://api.com");
+    return 0;
+}
+```
