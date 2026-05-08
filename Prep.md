@@ -1,4 +1,5 @@
 
+You are given N Airflow tasks (labeled 0 to N−1) and a list of dependencies where dependencies[i]=[a,b] indicates that task a must be completed before task b can start. Find a valid order of execution.
 
 ```
 #include <iostream>
@@ -160,5 +161,8 @@ int main() {
 
     return 0;
 }
+
+TC : O(V+E)
+SC : O(V+E)
 
 ```
