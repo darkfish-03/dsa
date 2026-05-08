@@ -538,3 +538,151 @@ int main() {
 }
 
 ```
+
+You are playing a board game represented by a grid. Each cell in the grid is described by a two-character string:
+
+The first character represents the area type (e.g., G, W, S).
+The second character represents the number of crowns in that cell.
+Example board:
+
+[
+  ["G1", "G2", "W0", "W1", "S1"],
+  ["G2", "G3", "W0", "W1", "S1"],
+  ["S2", "S3", "S1", "G1", "S1"],
+  ["G1", "G2", "W0", "W1", "S1"],
+  ["G1", "G2", "W0", "W1", "S1"]
+]
+Scoring Rules
+An area is defined as a group of orthogonally connected cells (up, down, left, right) with the same area type.
+For each distinct area:
+Count the number of cells in the area.
+Sum the number of crowns across all cells in the area.
+The area’s score is calculated as: (area size) × (total crowns in that area)
+The total score is the sum of the scores of all areas on the board.
+Example
+For the G area starting at position (0, 0):
+Area size = 4 cells
+Total crowns = 8
+Area score = 4 × 8 = 32
+For the W area starting at position (0, 2):
+Area size = 4 cells
+Total crowns = 2
+Area score = 4 × 2 = 8
+Calculate and return the total score for the entire board.
+```
+#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+class KingdomScoreCalculator {
+
+private:
+
+    vector<pair<int, int>> directions = {
+        {1, 0},
+        {-1, 0},
+        {0, 1},
+        {0, -1}
+    };
+
+public:
+
+    int calculateScore(vector<vector<string>>& board) {
+
+        int rows = board.size();
+        int cols = board[0].size();
+
+        vector<vector<bool>> visited(
+            rows,
+            vector<bool>(cols, false)
+        );
+
+        int totalScore = 0;
+
+        for (int row = 0; row < rows; row++) {
+
+            for (int col = 0; col < cols; col++) {
+
+                if (visited[row][col]) {
+                    continue;
+                }
+
+                char terrainType =
+                    board[row][col][0];
+
+                int areaSize = 0;
+                int crownCount = 0;
+
+                queue<pair<int, int>> bfsQueue;
+
+                bfsQueue.push({row, col});
+                visited[row][col] = true;
+
+                while (!bfsQueue.empty()) {
+
+                    auto current =
+                        bfsQueue.front();
+
+                    bfsQueue.pop();
+
+                    int currentRow = current.first;
+                    int currentCol = current.second;
+
+                    areaSize++;
+
+                    crownCount +=
+                        board[currentRow][currentCol][1] - '0';
+
+                    for (auto& direction : directions) {
+
+                        int newRow =
+                            currentRow + direction.first;
+
+                        int newCol =
+                            currentCol + direction.second;
+
+                        if (newRow >= 0 &&
+                            newRow < rows &&
+                            newCol >= 0 &&
+                            newCol < cols &&
+                            !visited[newRow][newCol] &&
+                            board[newRow][newCol][0] == terrainType) {
+
+                            visited[newRow][newCol] = true;
+
+                            bfsQueue.push({newRow, newCol});
+                        }
+                    }
+                }
+
+                totalScore +=
+                    areaSize * crownCount;
+            }
+        }
+
+        return totalScore;
+    }
+};
+
+int main() {
+
+    vector<vector<string>> board = {
+
+        {"G1", "G2", "W0", "W1", "S1"},
+        {"G2", "G3", "W0", "W1", "S1"},
+        {"S2", "S3", "S1", "G1", "S1"},
+        {"G1", "G2", "W0", "W1", "S1"},
+        {"G1", "G2", "W0", "W1", "S1"}
+    };
+
+    KingdomScoreCalculator calculator;
+
+    cout << "Total Score: "
+         << calculator.calculateScore(board)
+         << endl;
+
+    return 0;
+}
+```
