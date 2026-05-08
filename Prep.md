@@ -686,3 +686,226 @@ int main() {
     return 0;
 }
 ```
+
+Given a list of strings, create a mapping where each value is the shortest unique substring that can uniquely identify its corresponding key string from all other strings in the list. This simulates an auto-complete system where typing the minimum unique substring should uniquely identify the full string.
+
+Input
+A list of strings
+
+Output
+A dictionary/map where:
+
+Keys are the original full strings
+Values are the shortest unique substrings that can uniquely identify each key
+Example
+Input
+[
+    'The Phantom Menace',
+    'Attack of the Clones',
+    'Revenge of the Sith',
+    'A New Hope',
+    'The Empire Strikes Back',
+    'The Return of the Jedi',
+    'The Force Awakens',
+    'The Last Jedi'
+]
+Output
+{
+    'The Phantom Menace': 'to',
+    'Attack of the Clones': 'tt',
+    'Revenge of the Sith': 'v',
+    'A New Hope': 'ho',
+    'The Empire Strikes Back': 'b',
+    'The Return of the Jedi': 'u',
+    'The Force Awakens': 'aw',
+    'The Last Jedi': 'tj'
+}
+```
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <unordered_map>
+
+using namespace std;
+
+// Node structure for the Trie
+struct TrieNode {
+    unordered_map<char, TrieNode*> children;
+    int count = 0;
+
+    // Optional: Destructor to prevent memory leaks in a real interview
+    ~TrieNode() {
+        for (auto& pair : children) {
+            delete pair.second;
+        }
+    }
+};
+
+class SuffixTrie {
+public:
+    SuffixTrie() {
+        root = new TrieNode();
+    }
+
+    ~SuffixTrie() {
+        delete root;
+    }
+
+    // Insert all possible suffixes of a word
+    void insertsuffixes(const string& word) {
+        for (int i = 0; i < word.length(); ++i) {
+            TrieNode* curr = root;
+            for (int j = i; j < word.length(); ++j) {
+                char c = word[j];
+                if (curr->children.find(c) == curr->children.end()) {
+                    curr->children[c] = new TrieNode();
+                }
+                curr = curr->children[c];
+                curr->count++; // Tracks how many strings share this substring
+            }
+        }
+    }
+
+    // Find the shortest substring that has a count of exactly 1
+    string findShortestUnique(const string& word) {
+        string shortest = word;
+        
+        for (int i = 0; i < word.length(); ++i) {
+            TrieNode* curr = root;
+            string currentSub = "";
+            for (int j = i; j < word.length(); ++j) {
+                char c = word[j];
+                currentSub += c;
+                curr = curr->children[c];
+
+                if (curr->count == 1) {
+                    if (currentSub.length() < shortest.length()) {
+                        shortest = currentSub;
+                    }
+                    break; // Move to next suffix; this is the shortest for this start point
+                }
+            }
+        }
+        return shortest;
+    }
+
+private:
+    TrieNode* root;
+};
+
+unordered_map<string, string> getShortestUniqueMapping(const vector<string>& inputs) {
+    SuffixTrie trie;
+    
+    // Pass 1: Build the Trie with all suffixes
+    for (const string& s : inputs) {
+        trie.insertsuffixes(s);
+    }
+
+    // Pass 2: Query each string for its shortest unique substring
+    unordered_map<string, string> result;
+    for (const string& s : inputs) {
+        result[s] = trie.findShortestUnique(s);
+    }
+    return result;
+}
+
+int main() {
+    vector<string> inputs = {
+        "The Phantom Menace", "Attack of the Clones", "Revenge of the Sith",
+        "A New Hope", "The Empire Strikes Back", "The Return of the Jedi",
+        "The Force Awakens", "The Last Jedi"
+    };
+
+    auto mapping = getShortestUniqueMapping(inputs);
+
+    for (const auto& pair : mapping) {
+        cout << "'" << pair.first << "': '" << pair.second << "'" << endl;
+    }
+
+    return 0;
+}
+l, l-1, l-2, 1 = l(l+1)/2
+TC : O(N*L^2)
+```
+String str = "Leetcode is a good community for software developers"
+String text = "is for developers"
+
+O/P: [1,7] since the given text is found between index 1 to 7 in given string
+
+String str = "Leetcode is a good community for software developers"
+String text = "is for lawyers"
+
+O/P: [-1,-1] since all the words are not found in the given string
+
+String str = "Leetcode is a good community for software developers"
+String text = "developers for"
+
+O/P: [-1,-1] since all the words in the text are not in the same order as in the string
+
+```
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+// Helper function to split string into words
+vector<string> split(const string& s) {
+    vector<string> words;
+    stringstream ss(s);
+    string word;
+    while (ss >> word) {
+        words.push_back(word);
+    }
+    return words;
+}
+
+vector<int> findWordRange(string str, string text) {
+    vector<string> strWords = split(str);
+    vector<string> textWords = split(text);
+
+    if (textWords.empty()) return {-1, -1};
+
+    int textPtr = 0;
+    int startIdx = -1;
+    int endIdx = -1;
+
+    for (int i = 0; i < strWords.size(); ++i) {
+        if (strWords[i] == textWords[textPtr]) {
+            if (textPtr == 0) {
+                startIdx = i; // Mark the beginning of the match
+            }
+            
+            textPtr++;
+
+            if (textPtr == textWords.size()) {
+                endIdx = i; // Mark the end of the match
+                return {startIdx, endIdx};
+            }
+        }
+    }
+
+    return {-1, -1};
+}
+
+int main() {
+    string str = "Leetcode is a good community for software developers";
+    
+    // Case 1: Success
+    vector<int> res1 = findWordRange(str, "is for developers");
+    cout << "[" << res1[0] << ", " << res1[1] << "]" << endl; // Output: [1, 7]
+
+    // Case 2: Missing words
+    vector<int> res2 = findWordRange(str, "is for lawyers");
+    cout << "[" << res2[0] << ", " << res2[1] << "]" << endl; // Output: [-1, -1]
+
+    // Case 3: Wrong order
+    vector<int> res3 = findWordRange(str, "developers for");
+    cout << "[" << res3[0] << ", " << res3[1] << "]" << endl; // Output: [-1, -1]
+
+    return 0;
+}
+
+```
