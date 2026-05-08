@@ -1247,3 +1247,42 @@ int main() {
     return 0;
 }
 ```
+
+Arithmetic RLE 
+
+```
+vector<vector<int>> encoder(vector<int> data) {
+    if (data.empty()) return {};
+    if (data.size() == 1) return {{data[0], 0, 1}};
+
+    vector<vector<int>> ans;
+    int prev = data[0];
+    int cnt = 1;
+    // Fix 1: Calculate diff using the first two elements
+    int diff = data[1] - data[0]; 
+    
+    for(int i = 1; i < data.size(); i++) {
+        // Check if the current element continues the existing arithmetic pattern
+        if(data[i] - data[i-1] == diff) {
+            cnt++;
+        } else {
+            // Pattern broke: save the current run
+            ans.push_back({prev, diff, cnt});
+            
+            // Fix 2: Reset for the new sequence
+            prev = data[i];
+            cnt = 1;
+            // Fix 3: Check if there's another element to establish a new diff
+            if (i + 1 < data.size()) {
+                diff = data[i+1] - data[i];
+            } else {
+                diff = 0; // Default for a single trailing element
+            }
+        }
+    }
+    // Fix 4: Push the final sequence remaining after the loop ends
+    ans.push_back({prev, diff, cnt});
+    
+    return ans;
+}
+```
