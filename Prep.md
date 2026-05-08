@@ -1478,3 +1478,64 @@ int main() {
     return 0;
 }
 ```
+
+
+Terrain Renderer
+
+```
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+class TerrainRenderer {
+public:
+
+    void render(const vector<int>& heights) {
+
+        if (heights.empty()) {
+            return;
+        }
+
+        int maxHeight = *max_element(
+            heights.begin(),
+            heights.end()
+        );
+
+        // Print terrain top -> bottom
+        for (int level = maxHeight; level >= 1; --level) {
+
+            string row;
+
+            for (int height : heights) {
+
+                row += (height >= level) ? '+' : ' ';
+            }
+
+            cout << row << endl;
+        }
+
+        // Base layer
+        cout << string(heights.size(), '+')
+             << " <--- base layer"
+             << endl;
+    }
+};
+
+int main() {
+
+    vector<int> terrain = {
+        5, 4, 3, 2, 1,
+        3, 4, 0, 3, 4
+    };
+
+    TerrainRenderer renderer;
+
+    renderer.render(terrain);
+
+    return 0;
+}
+
+```
