@@ -1539,3 +1539,149 @@ int main() {
 }
 
 ```
+Each water drop changes the effective landscape,
+so flow decisions must be recomputed dynamically.
+```
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+class WaterLand {
+public:
+
+    void pourWater(vector<int>& heights,
+                   int k,
+                   int water) {
+
+        int n = heights.size();
+
+        // Separate water layer
+        vector<int> waters(n, 0);
+
+        while (water--) {
+
+            int best = k;
+
+            // -------------------------
+            // Try LEFT
+            // -------------------------
+            for (int i = k - 1; i >= 0; --i) {
+
+                int curr =
+                    heights[i] + waters[i];
+
+                int next =
+                    heights[best] + waters[best];
+
+                // uphill -> stop
+                if (curr > next) {
+                    break;
+                }
+
+                // better position found
+                if (curr < next) {
+                    best = i;
+                }
+            }
+
+            // -------------------------
+            // Try RIGHT
+            // -------------------------
+            if (best == k) {
+
+                for (int i = k + 1; i < n; ++i) {
+
+                    int curr =
+                        heights[i] + waters[i];
+
+                    int next =
+                        heights[best] + waters[best];
+
+                    if (curr > next) {
+                        break;
+                    }
+
+                    if (curr < next) {
+                        best = i;
+                    }
+                }
+            }
+
+            // settle water
+            waters[best]++;
+        }
+
+        render(heights, waters);
+    }
+
+private:
+
+    void render(vector<int>& heights,
+                vector<int>& waters) {
+
+        int n = heights.size();
+
+        int maxHeight = 0;
+
+        for (int i = 0; i < n; ++i) {
+
+            maxHeight = max(
+                maxHeight,
+                heights[i] + waters[i]
+            );
+        }
+
+        // top -> bottom
+        for (int level = maxHeight;
+             level >= 1;
+             --level) {
+
+            for (int i = 0; i < n; ++i) {
+
+                // terrain
+                if (level <= heights[i]) {
+
+                    cout << "+";
+                }
+                // water
+                else if (
+                    level <= heights[i] + waters[i]
+                ) {
+
+                    cout << "W";
+                }
+                else {
+
+                    cout << " ";
+                }
+            }
+
+            cout << endl;
+        }
+
+        cout << string(n, '+')
+             << " <--- base layer"
+             << endl;
+    }
+};
+
+int main() {
+
+    vector<int> terrain = {
+        5,4,2,1,2,3,2,1,0,1,2,4
+    };
+
+    WaterLand solution;
+
+    solution.pourWater(
+        terrain,
+        5,   // drop index
+        10   // water units
+    );
+
+    return 0;
+}
+```
+```
