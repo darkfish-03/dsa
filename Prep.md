@@ -1110,3 +1110,140 @@ int main() {
     return 0;
 }
 ```
+
+Pagination
+
+```
+#include <iostream>
+#include <vector>
+#include <string>
+#include <unordered_set>
+
+using namespace std;
+
+class DisplayPage {
+public:
+
+    vector<string> displayPages(vector<string>& input, int pageSize) {
+
+        vector<string> result;
+
+        if (input.empty() || pageSize <= 0) {
+            return result;
+        }
+
+        int n = input.size();
+
+        // Instead of deleting from list
+        // mark entries as used
+        vector<bool> used(n, false);
+
+        int remaining = n;
+
+        unordered_set<string> seenHosts;
+
+        bool allowDuplicates = false;
+
+        int count = 0;
+
+        int i = 0;
+
+        while (remaining > 0) {
+
+            // Reached end -> restart traversal
+            if (i == n) {
+
+                i = 0;
+
+                // allow duplicates after one full pass
+                allowDuplicates = true;
+            }
+
+            // Skip already used entries
+            if (used[i]) {
+                i++;
+                continue;
+            }
+
+            string curr = input[i];
+
+            int commaIndex = curr.find(',');
+
+            string hostId = curr.substr(0, commaIndex);
+
+            // Add if unique OR duplicates allowed
+            if (seenHosts.find(hostId) == seenHosts.end() || allowDuplicates) {
+
+                result.push_back(curr);
+
+                seenHosts.insert(hostId);
+
+                used[i] = true;
+
+                remaining--;
+
+                count++;
+            }
+
+            i++;
+
+            // Page completed
+            if (count == pageSize) {
+
+                if (remaining > 0) {
+                    result.push_back(" ");
+                }
+
+                seenHosts.clear();
+
+                allowDuplicates = false;
+
+                count = 0;
+
+                i = 0;
+            }
+        }
+
+        return result;
+    }
+};
+
+void printResult(vector<string>& result) {
+
+    for (string& s : result) {
+
+        if (s == " ")
+            cout << "---- PAGE BREAK ----" << endl;
+        else
+            cout << s << endl;
+    }
+}
+
+int main() {
+
+    vector<string> input = {
+        "1,28,300.1,SanFrancisco",
+        "4,5,209.1,SanFrancisco",
+        "20,7,208.1,SanFrancisco",
+        "23,8,207.1,SanFrancisco",
+        "16,10,206.1,Oakland",
+        "1,16,205.1,SanFrancisco",
+        "6,29,204.1,SanFrancisco",
+        "7,20,203.1,SanFrancisco",
+        "8,21,202.1,SanFrancisco",
+        "2,18,201.1,SanFrancisco",
+        "2,30,200.1,SanFrancisco",
+        "15,27,109.1,Oakland",
+        "10,13,108.1,Oakland",
+        "11,26,107.1,Oakland"
+    };
+
+    DisplayPage solution;
+
+    vector<string> result = solution.displayPages(input, 5);
+
+    printResult(result);
+
+    return 0;
+}
+```
