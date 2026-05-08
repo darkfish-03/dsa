@@ -1289,34 +1289,37 @@ vector<vector<int>> encoder(vector<int> data) {
 #include <vector>
 #include <iostream>
 
+#include <vector>
+#include <iostream>
+
 class ArithmeticDecoder {
 private:
-    std::vector<std::vector<int>> encodedData;
-    int currentTupleIdx = 0;
+    // Store a reference to the data to avoid copying
+    const std::vector<std::vector<int>>& encodedData;
+    size_t currentTupleIdx = 0;
     int currentElementInRun = 0;
 
 public:
-    ArithmeticDecoder(std::vector<std::vector<int>> data) : encodedData(data) {}
+    // Constructor takes a const reference
+    ArithmeticDecoder(const std::vector<std::vector<int>>& data) 
+        : encodedData(data) {}
 
-    bool hasNext() {
-        // We have more data if we haven't finished the last tuple
+    bool hasNext() const {
         return currentTupleIdx < encodedData.size();
     }
 
     int next() {
+        // Accessing the current tuple (run)
         const auto& run = encodedData[currentTupleIdx];
-        int start = run[0];
-        int diff  = run[1];
-        int count = run[2];
+        
+        // Calculate the nex
+t value in the arithmetic sequence
+        int value = run[0] + (currentElementInRun * run[1]);
 
-        // Calculate value: start + (index_in_run * common_difference)
-        int value = start + (currentElementInRun * diff);
-
-        // Move to the next position
         currentElementInRun++;
 
-        // If we finished this run, jump to the start of the next tuple
-        if (currentElementInRun >= count) {
+        // If we've exhausted this run, move to the next tuple
+        if (currentElementInRun >= run[2]) {
             currentTupleIdx++;
             currentElementInRun = 0;
         }
@@ -1325,7 +1328,6 @@ public:
     }
 };
 
-// Usage Example:
 int main() {
     std::vector<std::vector<int>> encoded = {{3, 1, 3}, {10, 5, 4}};
     ArithmeticDecoder it(encoded);
@@ -1336,7 +1338,6 @@ int main() {
     // Output: 3 4 5 10 15 20 25
     return 0;
 }
-
 
 
 ```
