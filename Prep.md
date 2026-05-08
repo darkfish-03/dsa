@@ -1285,4 +1285,58 @@ vector<vector<int>> encoder(vector<int> data) {
     
     return ans;
 }
+
+#include <vector>
+#include <iostream>
+
+class ArithmeticDecoder {
+private:
+    std::vector<std::vector<int>> encodedData;
+    int currentTupleIdx = 0;
+    int currentElementInRun = 0;
+
+public:
+    ArithmeticDecoder(std::vector<std::vector<int>> data) : encodedData(data) {}
+
+    bool hasNext() {
+        // We have more data if we haven't finished the last tuple
+        return currentTupleIdx < encodedData.size();
+    }
+
+    int next() {
+        const auto& run = encodedData[currentTupleIdx];
+        int start = run[0];
+        int diff  = run[1];
+        int count = run[2];
+
+        // Calculate value: start + (index_in_run * common_difference)
+        int value = start + (currentElementInRun * diff);
+
+        // Move to the next position
+        currentElementInRun++;
+
+        // If we finished this run, jump to the start of the next tuple
+        if (currentElementInRun >= count) {
+            currentTupleIdx++;
+            currentElementInRun = 0;
+        }
+
+        return value;
+    }
+};
+
+// Usage Example:
+int main() {
+    std::vector<std::vector<int>> encoded = {{3, 1, 3}, {10, 5, 4}};
+    ArithmeticDecoder it(encoded);
+
+    while (it.hasNext()) {
+        std::cout << it.next() << " ";
+    }
+    // Output: 3 4 5 10 15 20 25
+    return 0;
+}
+
+
+
 ```
