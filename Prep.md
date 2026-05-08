@@ -909,3 +909,137 @@ int main() {
 }
 
 ```
+
+Given input of digit array, e.g. [4,1,8] return the smallest number can be created using all digits. For example [7,3,0,1] --> "1037". Note the result might overflow so you should return a string. You also don't need to use 0. For example, [0,1,2] should return "12".
+
+Follow up 1: What's the time complexity, can you do in O(N) time?
+
+Follow up 2: Similar to the original question with an additional lower bound as input. You need to make sure the number is greater than or equal to the lower bound. For example, [7,1,8] and lower bound = 719 should return "781"
+
+```
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+string smallestNumber(const vector<int>& digits) {
+    // 1. Count frequencies of each digit (0-9)
+    // Space: O(1) as the size is fixed at 10
+    int counts[10] = {0};
+    for (int d : digits) {
+        if (d >= 0 && d <= 9) {
+            counts[d]++;
+        }
+    }
+
+    string result = "";
+
+    // 2. Build string using digits 1 through 9
+    // Per instructions: "You also don't need to use 0"
+    for (int i = 1; i <= 9; ++i) {
+        // Append digit 'i', counts[i] times
+        result.append(counts[i], (char)(i + '0'));
+    }
+
+    return result.empty() ? "0" : result;
+}
+
+int main() {
+    // Example 1: [4, 1, 8] -> "148"
+    cout << "Input [4,1,8]: " << smallestNumber({4, 1, 8}) << endl;
+
+    // Example 2: [7, 3, 0, 1] -> "137" (skipping 0)
+    cout << "Input [7,3,0,1]: " << smallestNumber({7, 3, 0, 1}) << endl;
+
+    // Example 3: [0, 1, 2] -> "12"
+    cout << "Input [0,1,2]: " << smallestNumber({0, 1, 2}) << endl;
+
+    return 0;
+}
+
+```
+URL parser 
+```
+#include <iostream>
+#include <vector>
+#include <string>
+#include <unordered_map>
+#include <sstream>
+
+using namespace std;
+
+// Step 1: Helper to handle %XX decoding
+string decode(string s) {
+    string res = "";
+    for (int i = 0; i < s.length(); i++) {
+        if (s[i] == '%' && i + 2 < s.length()) {
+            // Convert hex to char (e.g., %26 -> '&')
+            res += (char)stoi(s.substr(i + 1, 2), nullptr, 16);
+            i += 2;
+        } else {
+            res += s[i];
+        }
+    }
+    return res;
+}
+
+void parseURL(string url) {
+    // 1. Boundary Check: Find '?' and ensure there's content after it
+    size_t qPos = url.find('?');
+    if (qPos == string::npos || qPos == url.length() - 1) {
+        cout << "{}" << endl;
+        return;
+    }
+
+    // 2. Extract the query part and split by '&'
+    string query = url.substr(qPos + 1);
+    stringstream ss(query);
+    string segment;
+    
+    // We'll use a map of vectors to simplify the "single vs multiple" logic
+    unordered_map<string, vector<string>> storage;
+
+    while (getline(ss, segment, '&')) {
+        if (segment.empty()) continue; // Handles extra '&&'
+
+        size_t eqPos = segment.find('=');
+        if (eqPos == string::npos) {
+            // Case: ?book (No '=' means value is "true")
+            storage[decode(segment)].push_back("true");
+        } else {
+            // Case: ?key=value
+            string key = decode(segment.substr(0, eqPos));
+            string val = decode(segment.substr(eqPos + 1));
+            storage[key].push_back(val);
+        }
+    }
+
+    // 3. Final Formatting (Match the specific requirements)
+    cout << "{ ";
+    for (auto const& [key, values] : storage) {
+        cout << key << ": ";
+        if (values.size() > 1) {
+            // Print as Array
+            cout << "[";
+            for(int i=0; i<values.size(); i++) 
+                cout << "\"" << values[i] << "\"" << (i == values.size()-1 ? "" : ", ");
+            cout << "] ";
+        } else {
+            // Print as Single String or Boolean
+            if (values[0] == "true") cout << "true ";
+            else cout << "\"" << values[0] << "\" ";
+        }
+    }
+    cout << "}" << endl;
+}
+
+int main() {
+    parseURL("http://api/movie?year=100&type=action");
+    parseURL("http://api/movie?type%26view=scifi&type=action");
+    parseURL("http://api/movie?book");
+    parseURL("http://api/movie"); // No '?'
+    return 0;
+}
+
+```
