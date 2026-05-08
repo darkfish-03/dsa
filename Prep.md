@@ -1341,3 +1341,137 @@ int main() {
 
 
 ```
+
+List of List Iterator
+
+```
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+class Vector2DIterator {
+private:
+
+    int row;
+    int col;
+
+    vector<vector<int>>& vec2d;
+
+public:
+
+    Vector2DIterator(vector<vector<int>>& vec)
+        : row(0), col(0), vec2d(vec) {
+    }
+
+    // Equivalent to Java next()
+    int next() {
+
+        int val = vec2d[row][col];
+
+        col++;
+
+        return val;
+    }
+
+    // Equivalent to Java hasNext()
+    bool hasNext() {
+
+        if (vec2d.empty()) {
+            return false;
+        }
+
+        while (row < vec2d.size()) {
+
+            if (col < vec2d[row].size()) {
+
+                return true;
+            }
+            else {
+
+                row++;
+
+                col = 0;
+            }
+        }
+
+        return false;
+    }
+
+    // Equivalent to Java remove()
+    void remove() {
+
+        int rowToBeRemoved = row;
+
+        int colToBeRemoved = col;
+
+        // If next() moved to next row
+        if (col == 0) {
+
+            rowToBeRemoved--;
+
+            colToBeRemoved =
+                vec2d[rowToBeRemoved].size() - 1;
+        }
+        else {
+
+            colToBeRemoved--;
+        }
+
+        // Remove element
+        vec2d[rowToBeRemoved].erase(
+            vec2d[rowToBeRemoved].begin() + colToBeRemoved
+        );
+
+        // Remove empty row
+        if (vec2d[rowToBeRemoved].empty()) {
+
+            vec2d.erase(vec2d.begin() + rowToBeRemoved);
+
+            row--;
+        }
+
+        if (col > 0) {
+            col--;
+        }
+    }
+};
+
+int main() {
+
+    vector<vector<int>> input = {
+        {1, 2},
+        {},
+        {3, 4},
+        {5}
+    };
+
+    Vector2DIterator it(input);
+
+    while (it.hasNext()) {
+
+        int val = it.next();
+
+        cout << val << " ";
+
+        if (val == 3) {
+            it.remove();
+        }
+    }
+
+    cout << endl;
+
+    cout << "After remove:" << endl;
+
+    for (auto& row : input) {
+
+        for (int num : row) {
+            cout << num << " ";
+        }
+
+        cout << endl;
+    }
+
+    return 0;
+}
+```
