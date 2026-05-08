@@ -1347,6 +1347,7 @@ List of List Iterator
 ```
 #include <iostream>
 #include <vector>
+#include <stdexcept>
 
 using namespace std;
 
@@ -1356,84 +1357,86 @@ private:
     int row;
     int col;
 
+    int lastRow;
+    int lastCol;
+
+    bool canRemove;
+
     vector<vector<int>>& vec2d;
 
 public:
 
     Vector2DIterator(vector<vector<int>>& vec)
-        : row(0), col(0), vec2d(vec) {
+        : row(0),
+          col(0),
+          lastRow(-1),
+          lastCol(-1),
+          canRemove(false),
+          vec2d(vec) {
     }
 
-    // Equivalent to Java next()
     int next() {
+
+        if (!hasNext()) {
+            throw runtime_error("No more elements");
+        }
 
         int val = vec2d[row][col];
 
+        lastRow = row;
+        lastCol = col;
+
         col++;
+
+        canRemove = true;
 
         return val;
     }
 
-    // Equivalent to Java hasNext()
     bool hasNext() {
-
-        if (vec2d.empty()) {
-            return false;
-        }
 
         while (row < vec2d.size()) {
 
             if (col < vec2d[row].size()) {
-
                 return true;
             }
-            else {
 
-                row++;
-
-                col = 0;
-            }
+            row++;
+            col = 0;
         }
 
         return false;
     }
 
-    // Equivalent to Java remove()
     void remove() {
 
-        int rowToBeRemoved = row;
-
-        int colToBeRemoved = col;
-
-        // If next() moved to next row
-        if (col == 0) {
-
-            rowToBeRemoved--;
-
-            colToBeRemoved =
-                vec2d[rowToBeRemoved].size() - 1;
-        }
-        else {
-
-            colToBeRemoved--;
+        if (!canRemove) {
+            throw runtime_error(
+                "remove() can only be called once after next()"
+            );
         }
 
-        // Remove element
-        vec2d[rowToBeRemoved].erase(
-            vec2d[rowToBeRemoved].begin() + colToBeRemoved
+        vec2d[lastRow].erase(
+            vec2d[lastRow].begin() + lastCol
         );
 
-        // Remove empty row
-        if (vec2d[rowToBeRemoved].empty()) {
-
-            vec2d.erase(vec2d.begin() + rowToBeRemoved);
-
-            row--;
-        }
-
-        if (col > 0) {
+        // If current row affected,
+        // shift col back by one
+        if (lastRow == row) {
             col--;
         }
+
+        // Remove empty row
+        if (vec2d[lastRow].empty()) {
+
+            vec2d.erase(vec2d.begin() + lastRow);
+
+            if (lastRow < row) {
+                row--;
+            }
+        }
+
+        canRemove = false;
     }
 };
 
@@ -1461,7 +1464,7 @@ int main() {
 
     cout << endl;
 
-    cout << "After remove:" << endl;
+    cout << "\nAfter remove():\n";
 
     for (auto& row : input) {
 
