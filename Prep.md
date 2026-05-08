@@ -412,3 +412,129 @@ int main() {
 }
 
 ```
+In a popular travel destination, several Airbnb hosts offer unique accommodations. Each host has a listing located at a specific point in the city and can influence other listings nearby. Each property is represented by a 0-indexed 2D integer array listings, where listings[i] = [xi, yi, ri]. Here, (xi, yi) represents the X-coordinate and Y-coordinate of the i-th host's property, while ri denotes the radius of their influence.
+
+When a guest books a property, that booking will result in nearby hosts to receive a booking as well, provided their listings fall within the influence radius of the original booking. The influence of one property can create a ripple effect, activating multiple bookings.
+
+Your task is to determine the maximum number of listings that can receive bookings if a guest initially books only one property.
+
+```
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+class MaxBookingEvaluator {
+
+private:
+
+    int dfs(int listing,
+            vector<vector<int>>& graph,
+            vector<bool>& visited) {
+
+        visited[listing] = true;
+
+        int bookings = 1;
+
+        for (int neighbor : graph[listing]) {
+
+            if (!visited[neighbor]) {
+
+                bookings += dfs(neighbor,
+                                graph,
+                                visited);
+            }
+        }
+
+        return bookings;
+    }
+
+    bool canInfluence(vector<int>& source,
+                      vector<int>& target) {
+
+        long long x1 = source[0];
+        long long y1 = source[1];
+        long long radius = source[2];
+
+        long long x2 = target[0];
+        long long y2 = target[1];
+
+        long long dx = x1 - x2;
+        long long dy = y1 - y2;
+
+        long long distanceSquared =
+            dx * dx + dy * dy;
+
+        long long radiusSquared =
+            radius * radius;
+
+        return distanceSquared <= radiusSquared;
+    }
+
+public:
+
+    int evaluate(vector<vector<int>>& listings) {
+
+        int numberOfListings = listings.size();
+
+        vector<vector<int>> graph(numberOfListings);
+
+        // Build directed graph
+        for (int i = 0; i < numberOfListings; i++) {
+
+            for (int j = 0; j < numberOfListings; j++) {
+
+                if (i == j) {
+                    continue;
+                }
+
+                if (canInfluence(listings[i],
+                                 listings[j])) {
+
+                    graph[i].push_back(j);
+                }
+            }
+        }
+
+        int maximumBookings = 0;
+
+        // Try starting from every listing
+        for (int i = 0; i < numberOfListings; i++) {
+
+            vector<bool> visited(numberOfListings,
+                                 false);
+
+            int currentBookings =
+                dfs(i,
+                    graph,
+                    visited);
+
+            maximumBookings =
+                max(maximumBookings,
+                    currentBookings);
+        }
+
+        return maximumBookings;
+    }
+};
+
+int main() {
+
+    vector<vector<int>> listings = {
+        {2, 1, 3},
+        {6, 1, 4}
+    };
+
+    MaxBookingEvaluator evaluator;
+
+    int result =
+        evaluator.evaluate(listings);
+
+    cout << "Maximum bookings: "
+         << result << endl;
+
+    return 0;
+}
+
+```
