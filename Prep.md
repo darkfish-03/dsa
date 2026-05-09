@@ -2150,3 +2150,110 @@ int main() {
 }
 
 ```
+Resolve Battle
+
+```
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <map>
+#include <algorithm>
+
+using namespace std;
+
+// Represents the static input provided by the user
+struct UnitCommand {
+    string name;
+    string currentArea;
+    string targetArea;
+    string action;
+    string supportTarget;
+};
+
+// Represents the dynamic state during simulation
+struct ResolveState {
+    int strength = 1;
+    bool isDead = false;
+    string finalLocation;
+};
+
+vector<string> resolveDiplomacy(const vector<string>& commands) {
+    map<string, UnitCommand> unitRegistry;
+    map<string, ResolveState> resolution;
+    map<string, vector<string>> areaContestants; // Who is ending up where?
+
+    // 1. Parse and Initialize
+    for (const string& line : commands) {
+        stringstream ss(line);
+        string name, current, action, target;
+        ss >> name >> current >> action;
+
+        UnitCommand cmd;
+        cmd.name = name;
+        cmd.currentArea = current;
+        cmd.action = action;
+
+        if (action == "Move") {
+            ss >> target;
+            cmd.targetArea = target;
+        } else {
+            cmd.targetArea = current;
+            if (action == "Support") ss >> cmd.supportTarget;
+        }
+
+        unitRegistry[name] = cmd;
+        resolution[name] = {1, false, cmd.targetArea};
+        areaContestants[cmd.targetArea].push_back(name);
+    }
+
+    // 2. Validate Supports (O(N) optimization: check targetArea map instead of nested loop)
+    for (auto const& [name, cmd] : unitRegistry) {
+        if (cmd.action == "Support") {
+            bool isCut = false;
+            // Support is cut if anyone (other than the supporter) is moving into the supporter's area
+            for (const string& occupant : areaContestants[cmd.currentArea]) {
+                if (occupant != name) {
+                    isCut = true;
+                    break;
+                }
+            }
+
+            if (!isCut && resolution.count(cmd.supportTarget)) {
+                resolution[cmd.supportTarget].strength++;
+            }
+        }
+    }
+
+    // 3. Resolve Battles
+    for (auto const& [area, names] : areaContestants) {
+        if (names.size() > 1) {
+            int maxS = 0;
+            for (const string& n : names) maxS = max(maxS, resolution[n].strength);
+            
+            int winners = 0;
+            for (const string& n : names) if (resolution[n].strength == maxS) winners++;
+
+            for (const string& n : names) {
+                if (winners > 1 || resolution[n].strength < maxS) {
+                    resolution[n].isDead = true;
+                }
+            }
+        }
+    }
+
+    // 4. Format Results
+    vector<string> results;
+    for (auto const& [name, res] : resolution) {
+        results.push_back(name + " " + (res.isDead ? "[dead]" : res.finalLocation));
+    }
+    return results;
+}
+
+int main() {
+    vector<string> input = {"A Paris Support B", "B Spain Move Marseille", "C Italy Move Marseille", "D London Move Paris"};
+    for (const string& r : resolveDiplomacy(input)) cout << r << endl;
+    return 0;
+}
+
+```
