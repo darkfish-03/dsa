@@ -1773,3 +1773,147 @@ public:
     }
 };
 ```
+Key Value Store
+
+```
+#include <iostream>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+
+using namespace std;
+
+class KeyValueStore {
+
+private:
+
+    // stores computed values
+    unordered_map<string, int> values;
+
+    // formula dependencies
+    // c -> [a, a, b]
+    unordered_map<string, vector<string>> formulas;
+
+    // reverse dependency graph
+    // a -> {c}
+    unordered_map<string, unordered_set<string>> dependents;
+
+public:
+
+    // O(number of affected dependent nodes)
+    void set_value(const string& key, int value) {
+
+        // remove previous formula dependencies
+        clear_dependencies(key);
+
+        // key becomes direct value node
+        formulas.erase(key);
+
+        values[key] = value;
+
+        // propagate updates
+        recompute_dependents(key);
+    }
+
+    // O(number of dependencies + affected graph)
+    void set_sum(const string& key,
+                 const vector<string>& deps) {
+
+        // remove old dependencies
+        clear_dependencies(key);
+
+        // store formula
+        formulas[key] = deps;
+
+        // build reverse dependency graph
+        for (const string& dep : deps) {
+
+            dependents[dep].insert(key);
+        }
+
+        // compute current value
+        recompute(key);
+    }
+
+    // O(1)
+    int get_value(const string& key) {
+
+        if (!values.count(key)) {
+            return 0;
+        }
+
+        return values[key];
+    }
+
+private:
+
+    void clear_dependencies(const string& key) {
+
+        if (!formulas.count(key)) {
+            return;
+        }
+
+        for (const string& dep : formulas[key]) {
+
+            dependents[dep].erase(key);
+        }
+    }
+
+    void recompute(const string& key) {
+
+        // recompute formula value
+        if (formulas.count(key)) {
+
+            int sum = 0;
+
+            for (const string& dep : formulas[key]) {
+
+                sum += get_value(dep);
+            }
+
+            values[key] = sum;
+        }
+
+        // propagate further
+        recompute_dependents(key);
+    }
+
+    void recompute_dependents(const string& key) {
+
+        if (!dependents.count(key)) {
+            return;
+        }
+
+        for (const string& dependent : dependents[key]) {
+
+            recompute(dependent);
+        }
+    }
+};
+
+int main() {
+
+    KeyValueStore store;
+
+    store.set_value("a", 5);
+    store.set_value("b", 10);
+
+    store.set_sum("c", {"a", "a", "b"});
+
+    cout << store.get_value("c") << endl;
+    // 20
+
+    store.set_value("a", 7);
+
+    cout << store.get_value("c") << endl;
+    // 24
+
+    store.set_value("c", 11);
+
+    cout << store.get_value("c") << endl;
+    // 11
+
+    return 0;
+}
+
+```
