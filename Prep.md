@@ -2341,4 +2341,157 @@ int main() {
 }
 
 
+#include <iostream>
+#include <vector>
+#include <string>
+#include <climits>
+
+using namespace std;
+
+class MinimumOrderedWindowFinder {
+public:
+
+    pair<int, int> findMinimumWindow(
+        const vector<string>& paragraph,
+        const vector<string>& keywords) {
+
+        if (paragraph.empty() || keywords.empty()) {
+            return {-1, -1};
+        }
+
+        int bestWindowStart = -1;
+        int bestWindowEnd = -1;
+        int minimumWindowLength = INT_MAX;
+
+        int searchStartIndex = 0;
+
+        while (searchStartIndex < paragraph.size()) {
+
+            // ---------------------------------------------------------
+            // STEP 1:
+            // Find a valid ordered sequence using forward traversal.
+            // ---------------------------------------------------------
+
+            int keywordIndex = 0;
+            int paragraphIndex = searchStartIndex;
+
+            while (paragraphIndex < paragraph.size() &&
+                   keywordIndex < keywords.size()) {
+
+                if (paragraph[paragraphIndex] ==
+                    keywords[keywordIndex]) {
+
+                    keywordIndex++;
+                }
+
+                paragraphIndex++;
+            }
+
+            // Could not find complete ordered sequence anymore.
+            if (keywordIndex < keywords.size()) {
+                break;
+            }
+
+            int windowEnd = paragraphIndex - 1;
+
+            // ---------------------------------------------------------
+            // STEP 2:
+            // Shrink window greedily from right to left.
+            //
+            // We walk backwards to find the tightest possible start
+            // index for this valid ending position.
+            // ---------------------------------------------------------
+
+            keywordIndex = keywords.size() - 1;
+            paragraphIndex = windowEnd;
+
+            while (keywordIndex >= 0) {
+
+                if (paragraph[paragraphIndex] ==
+                    keywords[keywordIndex]) {
+
+                    keywordIndex--;
+                }
+
+                paragraphIndex--;
+            }
+
+            int windowStart = paragraphIndex + 1;
+
+            // ---------------------------------------------------------
+            // STEP 3:
+            // Update best answer.
+            // ---------------------------------------------------------
+
+            int currentWindowLength =
+                windowEnd - windowStart + 1;
+
+            if (currentWindowLength < minimumWindowLength) {
+
+                minimumWindowLength = currentWindowLength;
+
+                bestWindowStart = windowStart;
+                bestWindowEnd = windowEnd;
+            }
+
+            // ---------------------------------------------------------
+            // STEP 4:
+            // Continue searching from next position.
+            //
+            // Any better window must start after current start.
+            // ---------------------------------------------------------
+
+            searchStartIndex = windowStart + 1;
+        }
+
+        return {bestWindowStart, bestWindowEnd};
+    }
+};
+
+int main() {
+
+    vector<string> paragraph = {
+        "apple",
+        "banana",
+        "cat",
+        "apple",
+        "dog",
+        "banana",
+        "apple",
+        "dog",
+        "cat"
+    };
+
+    vector<string> keywords = {
+        "banana",
+        "apple",
+        "cat"
+    };
+
+    MinimumOrderedWindowFinder finder;
+
+    pair<int, int> result =
+        finder.findMinimumWindow(paragraph, keywords);
+
+    cout << "Minimum Window:" << endl;
+    cout << "Start Index = " << result.first << endl;
+    cout << "End Index   = " << result.second << endl;
+
+    if (result.first != -1) {
+
+        cout << "Window Words: ";
+
+        for (int index = result.first;
+             index <= result.second;
+             index++) {
+
+            cout << paragraph[index] << " ";
+        }
+
+        cout << endl;
+    }
+
+    return 0;
+}
+
 ```
