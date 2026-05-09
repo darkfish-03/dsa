@@ -2085,4 +2085,68 @@ public:
     }
 };
 
+#include <bits/stdc++.h>
+using namespace std;
+
+struct Node {
+    int r, c;
+};
+
+int solveHackerPlay(vector<vector<int>>& grid, int k) {
+    int n = grid.size(), m = grid[0].size();
+
+    if (grid[0][0] == 1 || grid[n-1][m-1] == 1)
+        return -1;
+
+    vector<vector<int>> dist(n, vector<int>(m, INT_MAX));
+    queue<Node> q;
+
+    q.push({0, 0});
+    dist[0][0] = 0;
+
+    int dr[4] = {-1, 1, 0, 0};
+    int dc[4] = {0, 0, -1, 1};
+
+    while (!q.empty()) {
+        auto [r, c] = q.front();
+        q.pop();
+
+        for (int i = 0; i < 4; i++) {
+            for (int step = 1; step <= k; step++) {
+                int nr = r + dr[i] * step;
+                int nc = c + dc[i] * step;
+
+                if (nr < 0 || nc < 0 || nr >= n || nc >= m)
+                    break;
+
+                if (grid[nr][nc] == 1)
+                    break;
+
+                if (dist[nr][nc] < dist[r][c] + 1)
+                    break;
+
+                if (dist[nr][nc] > dist[r][c] + 1) {
+                    dist[nr][nc] = dist[r][c] + 1;
+                    q.push({nr, nc});
+                }
+            }
+        }
+    }
+
+    return dist[n-1][m-1] == INT_MAX ? -1 : dist[n-1][m-1];
+}
+
+int main() {
+    int n, m, k;
+    cin >> n >> m >> k;
+
+    vector<vector<int>> grid(n, vector<int>(m));
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> grid[i][j];
+
+    cout << solveHackerPlay(grid, k) << endl;
+}
+
 ```
