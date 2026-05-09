@@ -2026,3 +2026,63 @@ public:
 ```
 https://medium.com/@RamkrishnaKulka/traversal-of-a-self-looping-tree-a2e985eb9b34
 
+BFS on Binary Grid
+
+```
+#include <bits/stdc++.h>
+using namespace std;
+
+class Solution {
+public:
+    int shortestPathBinaryMatrix(vector<vector<int>>& grid) {
+        int n = grid.size();
+
+        // blocked start or end
+        if (grid[0][0] == 1 || grid[n-1][n-1] == 1)
+            return -1;
+
+        vector<vector<bool>> visited(n, vector<bool>(n, false));
+
+        int dirs[8][2] = {
+            {-1,-1}, {-1,0}, {-1,1},
+            {0,-1},          {0,1},
+            {1,-1},  {1,0},  {1,1}
+        };
+
+        queue<pair<int,int>> q;
+        q.push({0,0});
+        visited[0][0] = true;
+
+        int steps = 1; // path length includes start cell
+
+        while (!q.empty()) {
+            int sz = q.size();
+
+            while (sz--) {
+                auto [r, c] = q.front();
+                q.pop();
+
+                if (r == n - 1 && c == n - 1)
+                    return steps;
+
+                for (auto &d : dirs) {
+                    int nr = r + d[0];
+                    int nc = c + d[1];
+
+                    if (nr >= 0 && nc >= 0 && nr < n && nc < n &&
+                        !visited[nr][nc] && grid[nr][nc] == 0) {
+
+                        visited[nr][nc] = true;
+                        q.push({nr, nc});
+                    }
+                }
+            }
+
+            steps++; // increase after each BFS layer
+        }
+
+        return -1;
+    }
+};
+
+```
