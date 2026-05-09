@@ -2495,3 +2495,120 @@ int main() {
 }
 
 ```
+Collatz Conjecture
+
+```
+#include <iostream>
+#include <unordered_map>
+#include <algorithm>
+
+using namespace std;
+
+class CollatzConjecture {
+private:
+
+    unordered_map<long long, int> memo;
+
+public:
+
+    //--------------------------------------------------
+    // Find steps needed to reach 1
+    //--------------------------------------------------
+
+    int findSteps(long long number) {
+
+        //--------------------------------------------------
+        // Base case
+        //--------------------------------------------------
+
+        if (number <= 1) {
+            return 1;
+        }
+
+        //--------------------------------------------------
+        // Already computed
+        //--------------------------------------------------
+
+        if (memo.count(number)) {
+            return memo[number];
+        }
+
+        long long nextNumber;
+
+        //--------------------------------------------------
+        // Collatz transformation
+        //--------------------------------------------------
+
+        if (number % 2 == 0) {
+            nextNumber = number / 2;
+        }
+        else {
+            nextNumber = 3 * number + 1;
+        }
+
+        //--------------------------------------------------
+        // Recursive computation
+        //--------------------------------------------------
+
+        int steps = 1 + findSteps(nextNumber);
+
+        //--------------------------------------------------
+        // Store memo for original number
+        //--------------------------------------------------
+
+        memo[number] = steps;
+
+        return steps;
+    }
+
+    //--------------------------------------------------
+    // Find maximum steps from 1 to limit
+    //--------------------------------------------------
+
+    int findLongestSteps(int limit) {
+
+        if (limit < 1) {
+            return 0;
+        }
+
+        int maximumSteps = 0;
+
+        for (int number = 1;
+             number <= limit;
+             number++) {
+
+            int currentSteps =
+                findSteps(number);
+
+            maximumSteps =
+                max(maximumSteps,
+                    currentSteps);
+        }
+
+        return maximumSteps;
+    }
+};
+
+int main() {
+
+    CollatzConjecture solver;
+
+    cout << "Test 1: "
+         << solver.findLongestSteps(1)
+         << endl;
+
+    cout << "Test 2: "
+         << solver.findLongestSteps(10)
+         << endl;
+
+    cout << "Test 3: "
+         << solver.findLongestSteps(37)
+         << endl;
+
+    cout << "Test 4: "
+         << solver.findLongestSteps(101)
+         << endl;
+
+    return 0;
+}
+```
