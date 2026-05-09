@@ -1685,3 +1685,91 @@ int main() {
 }
 ```
 ```
+
+
+https://algo.monster/liteproblems/1257
+```
+class CommonRegionFinder {
+public:
+
+    string find(string region1,
+                string region2,
+                vector<vector<string>>& regionList) {
+
+        unordered_map<string, string> parent;
+
+        // child -> parent mapping
+        for (const auto& regions : regionList) {
+
+            string parentRegion = regions[0];
+
+            for (int i = 1; i < regions.size(); i++) {
+                parent[regions[i]] = parentRegion;
+            }
+        }
+
+        // store all ancestors of region1
+        unordered_set<string> ancestors;
+
+        string current = region1;
+
+        while (!current.empty()) {
+            ancestors.insert(current);
+
+            if (!parent.count(current)) {
+                break;
+            }
+
+            current = parent[current];
+        }
+
+        // move region2 upward
+        current = region2;
+
+        while (!current.empty()) {
+
+            if (ancestors.count(current)) {
+                return current;
+            }
+
+            if (!parent.count(current)) {
+                break;
+            }
+
+            current = parent[current];
+        }
+
+        return "";
+    }
+};
+class Solution {
+public:
+
+    TreeNode* lowestCommonAncestor(TreeNode* root,
+                                   TreeNode* p,
+                                   TreeNode* q) {
+
+        // base case
+        if (root == nullptr ||
+            root == p ||
+            root == q) {
+            return root;
+        }
+
+        TreeNode* leftLCA =
+            lowestCommonAncestor(root->left, p, q);
+
+        TreeNode* rightLCA =
+            lowestCommonAncestor(root->right, p, q);
+
+        // both sides returned non-null
+        // current node is LCA
+        if (leftLCA && rightLCA) {
+            return root;
+        }
+
+        // otherwise return non-null side
+        return leftLCA ? leftLCA : rightLCA;
+    }
+};
+```
