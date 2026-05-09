@@ -2024,3 +2024,5 @@ public:
     }
 };
 ```
+https://medium.com/@RamkrishnaKulka/traversal-of-a-self-looping-tree-a2e985eb9b34
+
