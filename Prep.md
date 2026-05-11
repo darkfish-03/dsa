@@ -2971,3 +2971,415 @@ int main() {
 }
 
 ```
+Refund Manager
+
+```
+
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
+
+using namespace std;
+
+using AmountInCents = long long;
+
+struct Payment {
+
+    string id;
+    string type;
+
+    AmountInCents originalAmount;
+    AmountInCents remainingAmount;
+
+    long long timestamp;
+    int priority;
+};
+
+struct Refund {
+
+    string id;
+    string paymentId;
+
+    AmountInCents amount;
+};
+
+struct PaymentComparator {
+
+    bool operator()(const Payment& a,
+                    const Payment& b) const {
+
+        // Smaller priority number = higher priority
+        if (a.priority != b.priority) {
+            return a.priority < b.priority;
+        }
+
+        // Latest timestamp first
+        if (a.timestamp != b.timestamp) {
+            return a.timestamp > b.timestamp;
+        }
+
+        // Deterministic ordering
+        return a.id < b.id;
+    }
+};
+
+class PaymentManager {
+
+private:
+
+    vector<Payment> payments;
+
+    unordered_map<string, int> priorityMap;
+
+public:
+
+    PaymentManager(
+        unordered_map<string, int> priorityConfig) {
+
+        priorityMap = priorityConfig;
+    }
+
+    void addPayment(
+        string paymentId,
+        string type,
+        AmountInCents amount,
+        long long timestamp) {
+
+        Payment payment;
+
+        payment.id = paymentId;
+        payment.type = type;
+
+        payment.originalAmount = amount;
+        payment.remainingAmount = amount;
+
+        payment.timestamp = timestamp;
+
+        payment.priority = priorityMap[type];
+
+        payments.push_back(payment);
+    }
+
+    vector<Refund> refundPayment(
+        AmountInCents amount) {
+
+        sort(payments.begin(),
+             payments.end(),
+             PaymentComparator());
+
+        AmountInCents targetAmount = amount;
+
+        vector<Refund> refunds;
+
+        int refundCounter = 1;
+
+        for (auto& payment : payments) {
+
+            if (targetAmount <= 0) {
+                break;
+            }
+
+            AmountInCents eligibleRefundAmount =
+                min(payment.remainingAmount,
+                    targetAmount);
+
+            if (eligibleRefundAmount <= 0) {
+                continue;
+            }
+
+            refunds.push_back({
+                "refund" + to_string(refundCounter++),
+                payment.id,
+                eligibleRefundAmount
+            });
+
+            payment.remainingAmount -=
+                eligibleRefundAmount;
+
+            targetAmount -=
+                eligibleRefundAmount;
+        }
+
+        return refunds;
+    }
+};
+
+void evaluatePaymentManager() {
+
+    unordered_map<string, int> priority = {
+
+        {"credit", 1},
+        {"credit_card", 2},
+        {"paypal", 3}
+    };
+
+    PaymentManager manager(priority);
+
+    manager.addPayment(
+        "payment1",
+        "credit",
+        100,
+        5);
+
+    manager.addPayment(
+        "payment2",
+        "credit_card",
+        80,
+        3);
+
+    manager.addPayment(
+        "payment3",
+        "credit",
+        50,
+        10);
+
+    manager.addPayment(
+        "payment4",
+        "credit",
+        40,
+        10);
+
+    vector<Refund> refunds =
+        manager.refundPayment(120);
+
+    AmountInCents totalRefunded = 0;
+
+    cout << "Refunds:" << endl;
+
+    for (const auto& refund : refunds) {
+
+        cout << refund.id
+             << " -> "
+             << refund.paymentId
+             << " -> $"
+             << refund.amount
+             << endl;
+
+        totalRefunded += refund.amount;
+    }
+
+    cout << endl;
+
+    cout << "Total refunded: $"
+         << totalRefunded
+         << endl;
+}
+
+int main() {
+
+    evaluatePaymentManager();
+
+    return 0;
+}
+
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <unordered_map>
+
+using namespace std;
+
+using AmountInCents = long long;
+
+struct Payment {
+
+    string id;
+    string type;
+
+    AmountInCents originalAmount;
+    AmountInCents remainingAmount;
+
+    long long timestamp;
+    int priority;
+};
+
+struct Refund {
+
+    string id;
+    string paymentId;
+
+    AmountInCents amount;
+};
+
+struct PaymentComparator {
+
+    bool operator()(const Payment& a,
+                    const Payment& b) const {
+
+        // Smaller priority number = higher priority
+        if (a.priority != b.priority) {
+            return a.priority > b.priority;
+        }
+
+        // Latest timestamp first
+        if (a.timestamp != b.timestamp) {
+            return a.timestamp < b.timestamp;
+        }
+
+        // Deterministic ordering
+        return a.id > b.id;
+    }
+};
+
+class PaymentManager {
+
+private:
+
+    priority_queue<
+        Payment,
+        vector<Payment>,
+        PaymentComparator
+    > paymentHeap;
+
+    unordered_map<string, int> priorityMap;
+
+public:
+
+    PaymentManager(
+        unordered_map<string, int> priorityConfig) {
+
+        priorityMap = priorityConfig;
+    }
+
+    void addPayment(
+        string paymentId,
+        string type,
+        AmountInCents amount,
+        long long timestamp) {
+
+        Payment payment;
+
+        payment.id = paymentId;
+        payment.type = type;
+
+        payment.originalAmount = amount;
+        payment.remainingAmount = amount;
+
+        payment.timestamp = timestamp;
+
+        payment.priority = priorityMap[type];
+
+        paymentHeap.push(payment);
+    }
+
+    vector<Refund> refundPayment(
+        AmountInCents amount) {
+
+        AmountInCents remainingRefund =
+            amount;
+
+        vector<Refund> refunds;
+
+        int refundCounter = 1;
+
+        while (!paymentHeap.empty() &&
+               remainingRefund > 0) {
+
+            Payment payment =
+                paymentHeap.top();
+
+            paymentHeap.pop();
+
+            AmountInCents eligibleRefundAmount =
+                min(payment.remainingAmount,
+                    remainingRefund);
+
+            if (eligibleRefundAmount <= 0) {
+                continue;
+            }
+
+            refunds.push_back({
+
+                "refund" +
+                to_string(refundCounter++),
+
+                payment.id,
+
+                eligibleRefundAmount
+            });
+
+            payment.remainingAmount -=
+                eligibleRefundAmount;
+
+            remainingRefund -=
+                eligibleRefundAmount;
+
+            // Reinsert if balance remains
+            if (payment.remainingAmount > 0) {
+                paymentHeap.push(payment);
+            }
+        }
+
+        return refunds;
+    }
+};
+
+void evaluatePaymentManager() {
+
+    unordered_map<string, int> priority = {
+
+        {"credit", 1},
+        {"credit_card", 2},
+        {"paypal", 3}
+    };
+
+    PaymentManager manager(priority);
+
+    manager.addPayment(
+        "payment1",
+        "credit",
+        100,
+        5);
+
+    manager.addPayment(
+        "payment2",
+        "credit_card",
+        80,
+        3);
+
+    manager.addPayment(
+        "payment3",
+        "credit",
+        50,
+        10);
+
+    manager.addPayment(
+        "payment4",
+        "credit",
+        40,
+        10);
+
+    vector<Refund> refunds =
+        manager.refundPayment(120);
+
+    AmountInCents totalRefunded = 0;
+
+    cout << "Refunds:" << endl;
+
+    for (const auto& refund : refunds) {
+
+        cout << refund.id
+             << " -> "
+             << refund.paymentId
+             << " -> $"
+             << refund.amount
+             << endl;
+
+        totalRefunded += refund.amount;
+    }
+
+    cout << endl;
+
+    cout << "Total refunded: $"
+         << totalRefunded
+         << endl;
+}
+
+int main() {
+
+    evaluatePaymentManager();
+
+    return 0;
+}
+```
