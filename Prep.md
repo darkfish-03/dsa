@@ -2872,9 +2872,7 @@ Using Binary Search
 using namespace std;
 
 class SplitStayFinder {
-
 public:
-
     vector<pair<string, string>> find(
         const unordered_map<string, vector<int>>& listings,
         int start,
@@ -2882,120 +2880,93 @@ public:
 
         unordered_map<string, unordered_set<int>> availability;
 
-        // Convert list of days into hash sets
+        // Convert list of days into hash sets for O(1) lookup
         for (const auto& [listingId, days] : listings) {
-            availability[listingId] =
-                unordered_set<int>(days.begin(), days.end());
+            availability[listingId] = unordered_set<int>(days.begin(), days.end());
         }
 
-        // listingId -> farthest reachable day from start
+        // listingId -> farthest day reached from start
         unordered_map<string, int> coverageFromStart;
-
-        // listingId -> earliest reachable day from end
+        // listingId -> earliest day reached from end
         unordered_map<string, int> coverageFromEnd;
 
-        // Compute continuous coverage
         for (const auto& [listingId, daysSet] : availability) {
-
-            // Coverage from start
+            // Check coverage from start
             if (daysSet.count(start)) {
-
                 int currentDay = start;
-
-                while (currentDay < end &&
-                       daysSet.count(currentDay + 1)) {
+                while (currentDay < end && daysSet.count(currentDay + 1)) {
                     currentDay++;
                 }
-
                 coverageFromStart[listingId] = currentDay;
             }
 
-            // Coverage from end
+            // Check coverage from end
             if (daysSet.count(end)) {
-
                 int currentDay = end;
-
-                while (currentDay > start &&
-                       daysSet.count(currentDay - 1)) {
+                while (currentDay > start && daysSet.count(currentDay - 1)) {
                     currentDay--;
                 }
-
                 coverageFromEnd[listingId] = currentDay;
             }
         }
 
-        // Convert to vector for sorting + binary search
+        // Store and sort by the start of the second stay
         vector<pair<int, string>> endCoverageList;
-
-        for (const auto& [listingId, startDay] :
-             coverageFromEnd) {
-
-            endCoverageList.push_back(
-                {startDay, listingId});
+        for (const auto& [listingId, startDay] : coverageFromEnd) {
+            endCoverageList.push_back({startDay, listingId});
         }
-
-        sort(endCoverageList.begin(),
-             endCoverageList.end());
+        sort(endCoverageList.begin(), endCoverageList.end());
 
         vector<pair<string, string>> result;
 
-        // Find compatible pairs
-        for (const auto& [startListingId, endDay] :
-             coverageFromStart) {
+        // Pair the stays
+        for (const auto& [startListingId, endDay] : coverageFromStart) {
+            // If Listing A ends on day 'endDay', Listing B must start by 'endDay + 1'
+            int maxRequiredStart = endDay + 1;
 
-            int requiredStartDay = endDay + 1;
-
-            // Find first invalid listing
+            // Custom comparator: find first listing starting AFTER maxRequiredStart
             auto it = upper_bound(
                 endCoverageList.begin(),
                 endCoverageList.end(),
-                make_pair(requiredStartDay, string()));
+                maxRequiredStart,
+                [](int val, const pair<int, string>& element) {
+                    return val < element.first;
+                }
+            );
 
-            // All entries before 'it' are valid
-            for (auto curr = endCoverageList.begin();
-                 curr != it;
-                 curr++) {
-
+            // Every listing from begin() to 'it' is a valid second stay
+            for (auto curr = endCoverageList.begin(); curr != it; ++curr) {
                 string endListingId = curr->second;
 
-                if (startListingId == endListingId) {
-                    continue;
-                }
+                // Ensure we aren't splitting between the same listing 
+                // unless that's specifically desired
+                if (startListingId == endListingId) continue;
 
-                result.push_back(
-                    {startListingId, endListingId});
+                result.push_back({startListingId, endListingId});
             }
         }
 
         sort(result.begin(), result.end());
-
         return result;
     }
 };
 
 void evaluate_split_stay() {
-
     unordered_map<string, vector<int>> listings;
-
-    listings["A"] = {1,2,3};
-    listings["B"] = {4,5};
-    listings["C"] = {3,4,5};
+    listings["A"] = {1, 2, 3};
+    listings["B"] = {4, 5};
+    listings["C"] = {3, 4, 5};
 
     SplitStayFinder finder;
-
-    vector<pair<string, string>> result =
-        finder.find(listings, 1, 5);
+    vector<pair<string, string>> result = finder.find(listings, 1, 5);
 
     for (const auto& [first, second] : result) {
-        cout << first << ", "
-             << second << endl;
+        cout << first << ", " << second << endl;
     }
 }
 
 int main() {
-
     evaluate_split_stay();
-
     return 0;
 }
 
