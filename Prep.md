@@ -2760,3 +2760,105 @@ public:
     }
 };
 ```
+
+Split Stay
+
+```
+#include <cmath>
+#include <cstdio>
+#include <system_error>
+#include <vector>
+#include <unordered_map>
+#include <unordered_set>
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+class SplitStayFinder {
+    
+    public:
+        vector<pair<string, string>> find(unordered_map<string, vector<int>> listings, 
+        int start, int end) {
+             unordered_map<string, unordered_set<int>> listingsMap;
+             
+             for(auto &[id, listing] : listings) {
+                for(int day : listing) {
+                    listingsMap[id].insert(day);
+                }
+             }
+             
+             unordered_map<string, int> coverageFromStart;
+             unordered_map<string, int> coverageFromEnd;
+             
+             for(auto &[id, listing] : listingsMap) {
+                
+                if (listing.count(start)) {
+                    int curr = start;
+                    while(curr<end && listing.count(curr+1)) {
+                        curr++;
+                    }
+                    coverageFromStart[id] = curr;
+                }
+                
+                if (listing.count(end)) {
+                    int curr = end;
+                    while(curr>start && listing.count(curr-1)) {
+                        curr--;
+                    }
+                    coverageFromEnd[id] = curr;
+                }
+             }
+             
+             
+             
+             vector<pair<string, string>> result;
+             
+             for(auto &[startListingId, startCoverageEnd] : coverageFromStart) {
+                for(auto &[endListingId, endCoverageStart] : coverageFromEnd) {
+                    if(startListingId == endListingId) continue;
+                    if (endCoverageStart<=startCoverageEnd+1) {
+                        result.push_back({startListingId, endListingId});
+                    }
+                }
+             }
+             
+             sort(result.begin(), result.end());
+             return result;
+        } 
+};
+
+void evaluate_split_stay() {
+    unordered_map<string, vector<int>> listings;
+    listings["A"] = {1,2,3,6,7,10,11};
+    listings["B"] = {3,4,5,6,8,9,10,13};
+    listings["C"] = {7,8,9,10,11};
+    SplitStayFinder finder;
+    vector<pair<string, string>> result = finder.find(listings, 3, 11);
+    for(auto& it : result) {
+        cout << it.first << ", " << it.second << endl;
+    }
+}
+
+void evaluate_split_stay_multiple_valid_stay() {
+    unordered_map<string, vector<int>> listings;
+    listings["A"] = {1,2,3};
+    listings["B"] = {4,5};
+    listings["C"] = {3,4,5};
+    SplitStayFinder finder;
+    vector<pair<string, string>> result = finder.find(listings, 1, 5);
+    for(auto& it : result) {
+        cout << it.first << ", " << it.second << endl;
+    }
+}
+
+// A 3
+// B 4, C 3
+
+int main() {
+    //evaluate_split_stay();
+    //cout<< endl;
+    evaluate_split_stay_multiple_valid_stay();
+    return 0;
+}
+
+```
