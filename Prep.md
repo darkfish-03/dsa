@@ -3583,4 +3583,36 @@ int main() {
 
     return 0;
 }
+
+ // Reconstruction
+        vector<string> result;
+
+        int item = n - 1;
+        int amount = targetInCents;
+
+        while (amount > 0 &&
+               item >= 0) {
+
+            // Current item not taken
+            if (item > 0 &&
+                dp[item][amount]
+                ==
+                dp[item - 1][amount]) {
+
+                item--;
+            }
+            else {
+
+                // Current item taken
+                result.push_back(
+                    menu[item].first
+                );
+
+                amount -=
+                    menu[item].second;
+            }
+        }
+
+        return result;
+    }
 ```
