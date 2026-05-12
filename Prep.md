@@ -3801,3 +3801,131 @@ int main() {
 }
 
 ```
+DP
+
+```
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+struct Property {
+    int id;
+    string neighborhood;
+    int capacity;
+};
+
+// Returns a pair: {minimum_property_count, vector_of_selected_property_ids}
+pair<int, vector<int>> minimumPropertyCountAndIds(
+    vector<Property>& properties,
+    string targetNeighborhood,
+    int groupSize
+) {
+    vector<Property> filteredProps;
+
+    // Filter properties from target neighborhood
+    for (const auto& property : properties) {
+        if (property.neighborhood == targetNeighborhood) {
+            filteredProps.push_back(property);
+        }
+    }
+
+    int n = filteredProps.size();
+    if (n == 0) return {-1, {}};
+
+    int totalCapacity = 0;
+    for (const auto& prop : filteredProps) {
+        totalCapacity += prop.capacity;
+    }
+
+    if (totalCapacity < groupSize) return {-1, {}};
+
+    const int INF = 1e9;
+
+    // dp[i][c] represents the minimum properties needed
+    // using the first 'i' properties to make EXACT capacity 'c'
+    vector<vector<int>> dp(n + 1, vector<int>(totalCapacity + 1, INF));
+
+    // Base Case: 0 properties are needed to make exactly 0 capacity
+    dp[0][0] = 0; 
+
+    // Loop through properties (1-indexed for row access)
+    for (int i = 1; i <= n; i++) {
+        int currentCapacity = filteredProps[i - 1].capacity; 
+
+        for (int c = 0; c <= totalCapacity; c++) {
+            // Option 1: Do not take the current property
+            int notTake = dp[i - 1][c];
+
+            // Option 2: Take the current property (if capacity bounds allow)
+            int take = INF;
+            if (c >= currentCapacity && dp[i - 1][c - currentCapacity] != INF) {
+                take = 1 + dp[i - 1][c - currentCapacity];
+            }
+
+            dp[i][c] = min(take, notTake);
+        }
+    }
+
+    // Find the minimum achievable capacity >= groupSize
+    int bestCapacity = -1;
+    int minCount = INF;
+    
+    for (int c = groupSize; c <= totalCapacity; c++) {
+        if (dp[n][c] != INF) {
+            bestCapacity = c;
+            minCount = dp[n][c];
+            break; // First match guarantees the lowest total capacity
+        }
+    }
+
+    if (bestCapacity == -1) return {-1, {}};
+
+    // --- WHILE LOOP RECONSTRUCTION ---
+    vector<int> selectedIds;
+    int item = n;
+    int amount = bestCapacity;
+
+    while (amount > 0 && item > 0) {
+        // Current item was NOT taken if the optimal value is identical to the row above
+        if (dp[item][amount] == dp[item - 1][amount]) {
+            item--;
+        } 
+        else {
+            // Current item WAS taken
+            selectedIds.push_back(filteredProps[item - 1].id);
+            amount -= filteredProps[item - 1].capacity;
+            item--; // Move to previous property since each property can only be used once (0/1 Knapsack)
+        }
+    }
+
+    // Reverse to match the original sequence order of properties
+    reverse(selectedIds.begin(), selectedIds.end());
+
+    return {minCount, selectedIds};
+}
+
+int main() {
+    vector<Property> properties = {
+        {1, "area1", 5},
+        {2, "area1", 3},
+        {3, "area1", 2},
+        {4, "area2", 4}
+    };
+
+    auto result = minimumPropertyCountAndIds(properties, "area1", 6);
+
+    cout << "Minimum Property Count: " << result.first << endl;
+    cout << "Selected Property IDs: [";
+    for (size_t i = 0; i < result.second.size(); ++i) {
+        cout << result.second[i] << (i + 1 < result.second.size() ? ", " : "");
+    }
+    cout << "]" << endl;
+
+    return 0;
+
+	I will implement this using a 2D DP matrix first. This will make the solution reconstruction via backtracking very clear and easier to verify for correctness. The space complexity will be \(\mathcal{O}(N \times C)\). Once this is fully working, if we have time, I can optimize it to a 1D vector to bring the space complexity down to \(\mathcal{O}(C)\)."
+}
+```
