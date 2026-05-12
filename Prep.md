@@ -3708,3 +3708,96 @@ int main() {
     return 0;
 }
 ```
+
+```
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+
+using namespace std;
+
+struct Property {
+    int id;
+    string neighborhood;
+    int capacity;
+};
+
+int minimumPropertyCount(
+    vector<Property>& properties,
+    string targetNeighborhood,
+    int groupSize
+) {
+    vector<int> capacities;
+
+    // Filter properties from target neighborhood
+    for (const auto& property : properties) {
+        if (property.neighborhood == targetNeighborhood) {
+            capacities.push_back(property.capacity);
+        }
+    }
+
+    int n = capacities.size();
+    if (n == 0) return -1;
+
+    int totalCapacity = 0;
+    for (int capacity : capacities) {
+        totalCapacity += capacity;
+    }
+
+    if (totalCapacity < groupSize) return -1;
+
+    const int INF = 1e9;
+
+    // dp[i][c] represents the minimum properties needed
+    // using the first 'i' properties to make EXACT capacity 'c'
+    // Size is (n + 1) to handle the 0-properties base row safely
+    vector<vector<int>> dp(n + 1, vector<int>(totalCapacity + 1, INF));
+
+    // Base Case: 0 properties are needed to make exactly 0 capacity
+    dp[0][0] = 0; 
+
+    // Loop through properties (1-indexed for row access)
+    for (int i = 1; i <= n; i++) {
+        int currentCapacity = capacities[i - 1]; // 0-indexed capacity access
+
+        for (int c = 0; c <= totalCapacity; c++) {
+            // Option 1: Do not take the current property
+            int notTake = dp[i - 1][c];
+
+            // Option 2: Take the current property (if capacity bounds allow)
+            int take = INF;
+            if (c >= currentCapacity && dp[i - 1][c - currentCapacity] != INF) {
+                take = 1 + dp[i - 1][c - currentCapacity];
+            }
+
+            dp[i][c] = min(take, notTake);
+        }
+    }
+
+    // Find minimum achievable capacity >= groupSize
+    // Sweeping upwards ensures we pick the absolute lowest capacity exceeding groupSize first
+    for (int c = groupSize; c <= totalCapacity; c++) {
+        if (dp[n][c] != INF) {
+            return dp[n][c]; 
+        }
+    }
+
+    return -1;
+}
+
+int main() {
+    vector<Property> properties = {
+        {1, "area1", 5},
+        {2, "area1", 3},
+        {3, "area1", 2},
+        {4, "area2", 4}
+    };
+
+    // Correctly prints 2 (Properties of capacities 5 and 2 give capacity 7, which exceeds 6)
+    cout << minimumPropertyCount(properties, "area1", 6) << endl;
+
+    return 0;
+}
+
+```
