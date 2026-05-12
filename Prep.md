@@ -3383,3 +3383,104 @@ int main() {
     return 0;
 }
 ```
+All Possible Orders
+```
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cmath>
+
+using namespace std;
+
+class OrderEvaluator {
+
+private:
+
+    void findCombinations(
+        int startIndex,
+        int remainingAmount,
+        vector<pair<string, int>>& menu,
+        vector<string>& currentOrder,
+        vector<vector<string>>& allOrders
+    ) {
+
+        // Found valid order
+        if (remainingAmount == 0) {
+            allOrders.push_back(currentOrder);
+            return;
+        }
+
+        // Invalid path
+        if (remainingAmount < 0) {
+            return;
+        }
+
+        for (int i = startIndex; i < menu.size(); i++) {
+
+            currentOrder.push_back(menu[i].first);
+
+            // Reuse same item again -> pass i
+            findCombinations(
+                i,
+                remainingAmount - menu[i].second,
+                menu,
+                currentOrder,
+                allOrders
+            );
+
+            currentOrder.pop_back();
+        }
+    }
+
+public:
+
+    vector<vector<string>> evaluateAllPossibleOrders(
+        vector<pair<string, int>>& menu,
+        double targetAmount
+    ) {
+
+        int targetInCents = round(targetAmount * 100);
+
+        vector<vector<string>> allOrders;
+        vector<string> currentOrder;
+
+        findCombinations(
+            0,
+            targetInCents,
+            menu,
+            currentOrder,
+            allOrders
+        );
+
+        return allOrders;
+    }
+};
+
+int main() {
+
+    vector<pair<string, int>> menu = {
+        {"Fruit", 215},
+        {"Fries", 275},
+        {"Salad", 335},
+        {"Wings", 355},
+        {"Moz", 420},
+        {"Plate", 580}
+    };
+
+    OrderEvaluator orderEvaluator;
+
+    vector<vector<string>> result =
+        orderEvaluator.evaluateAllPossibleOrders(menu, 15.05);
+
+    for (auto& order : result) {
+
+        for (auto& item : order) {
+            cout << item << " ";
+        }
+
+        cout << endl;
+    }
+
+    return 0;
+}
+```
