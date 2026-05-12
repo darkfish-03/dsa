@@ -3616,3 +3616,95 @@ int main() {
         return result;
     }
 ```
+
+Group Accomodation
+
+```
+Backtracking
+
+#include <iostream>
+#include <vector>
+#include <string>
+
+struct Property {
+    int id;
+    std::string neighborhood;
+    int capacity;
+};
+
+// Helper function that performs the recursive backtracking search
+void backtrack(const std::vector<Property>& props, size_t index, int group_size,
+               std::vector<int>& current_comb, int current_capacity,
+               std::vector<int>& best_combination, int& min_capacity, size_t& min_properties_count) {
+    
+    // Condition 1: Current selection can accommodate the group size
+    if (current_capacity >= group_size) {
+        // Update if it has lower total capacity, OR same capacity with fewer properties
+        if (current_capacity < min_capacity || 
+           (current_capacity == min_capacity && current_comb.size() < min_properties_count)) {
+            min_capacity = current_capacity;
+            min_properties_count = current_comb.size();
+            best_combination = current_comb;
+        }
+        return; 
+    }
+
+    // Condition 2: Checked all available properties
+    if (index >= props.size()) {
+        return;
+    }
+
+    // Choice 1: Include the current property
+    current_comb.push_back(props[index].id);
+    backtrack(props, index + 1, group_size, current_comb, current_capacity + props[index].capacity,
+              best_combination, min_capacity, min_properties_count);
+    current_comb.pop_back(); // Backtrack step
+
+    // Choice 2: Exclude the current property
+    backtrack(props, index + 1, group_size, current_comb, current_capacity,
+              best_combination, min_capacity, min_properties_count);
+}
+
+std::vector<int> findOptimalProperties(const std::vector<Property>& properties, 
+                                       int group_size, 
+                                       const std::string& target_neighborhood) {
+    // Filter properties to match only the target neighborhood
+    std::vector<Property> filtered_props;
+    for (const auto& prop : properties) {
+        if (prop.neighborhood == target_neighborhood) {
+            filtered_props.push_back(prop);
+        }
+    }
+
+    // Local state tracking variables (No global variables used)
+    std::vector<int> best_combination;
+    std::vector<int> current_comb;
+    int min_capacity = 1e9; 
+    size_t min_properties_count = 1e9;
+
+    // Execute search from index 0
+    backtrack(filtered_props, 0, group_size, current_comb, 0,
+              best_combination, min_capacity, min_properties_count);
+
+    return best_combination;
+}
+
+int main() {
+    std::vector<Property> properties = {
+        {1, "area1", 5},
+        {2, "area1", 3},
+        {3, "area1", 2},
+        {4, "area2", 4}
+    };
+
+    std::vector<int> result = findOptimalProperties(properties, 6, "area1");
+
+    std::cout << "Result: [";
+    for (size_t i = 0; i < result.size(); ++i) {
+        std::cout << result[i] << (i + 1 < result.size() ? ", " : "");
+    }
+    std::cout << "]" << std::endl;
+
+    return 0;
+}
+```
