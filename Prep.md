@@ -3483,4 +3483,104 @@ int main() {
 
     return 0;
 }
+
+Count of all possible combinations
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cmath>
+
+using namespace std;
+
+class OrderEvaluator {
+
+public:
+
+    int evaluateAllPossibleOrders(
+        vector<pair<string, int>>& menu,
+        double targetAmount
+    ) {
+
+        int targetInCents =
+            round(targetAmount * 100);
+
+        int n = menu.size();
+
+        const int INF = 1e9;
+
+        vector<vector<int>> dp(
+            n,
+            vector<int>(targetInCents + 1, INF)
+        );
+
+        // Base Case
+        for (int amount = 0;
+             amount <= targetInCents;
+             amount++) {
+
+            if (amount % menu[0].second == 0) {
+
+                dp[0][amount] =
+                    amount / menu[0].second;
+            }
+        }
+
+        for (int item = 1;
+             item < n;
+             item++) {
+
+            for (int amount = 0;
+                 amount <= targetInCents;
+                 amount++) {
+
+                int notTake =
+                    dp[item - 1][amount];
+
+                int take = INF;
+
+                if (menu[item].second <= amount) {
+
+                    take =
+                        1 +
+                        dp[item][amount -
+                                 menu[item].second];
+                }
+
+                dp[item][amount] =
+                    min(take, notTake);
+            }
+        }
+
+        if (dp[n - 1][targetInCents] >= INF) {
+            return -1;
+        }
+
+        return dp[n - 1][targetInCents];
+    }
+};
+
+int main() {
+
+    vector<pair<string, int>> menu = {
+        {"Fruit", 215},
+        {"Fries", 275},
+        {"Salad", 335},
+        {"Wings", 355},
+        {"Moz", 420},
+        {"Plate", 580}
+    };
+
+    OrderEvaluator orderEvaluator;
+
+    int result =
+        orderEvaluator.evaluateAllPossibleOrders(
+            menu,
+            15.05
+        );
+
+    cout << result << endl;
+
+    return 0;
+}
 ```
