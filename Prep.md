@@ -4014,3 +4014,133 @@ int main() {
 }
 
 ```
+Ski Tournamant
+
+By processing the checkpoints in topological order, I can use Dynamic Programming to find the maximum score path in \(\mathcal{O}(V + E)\) time, which is optimal."
+
+```
+#include <cmath>
+#include <cstdio>
+#include <numeric>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <queue>
+#include <unordered_map>
+using namespace std;
+
+class SkiTournamentPathFinder {
+    
+    public:
+        vector<string> find(unordered_map<string, int>& nodePoints, 
+                            vector<vector<string>>& paths, 
+                            const string& startNode = "START") {
+            
+            unordered_map<string, int> inDegrees;
+            unordered_map<string, int> dp;
+            unordered_map<string, string> parent;
+            unordered_map<string, vector<pair<string, int>>> adjacencyList;
+            
+            // Initialize all nodes to negative infinity score
+            for(auto& [id, point] : nodePoints) {
+                inDegrees[id] = 0;
+                dp[id] = -1e9; 
+            }
+            
+            // Build the graph adjacency list and calculate true in-degrees
+            for(auto& path : paths) {
+                string from = path[0];
+                string to = path[1];
+                int weight = stoi(path[2]);
+                adjacencyList[from].push_back({to, weight});
+                inDegrees[to]++;
+            }
+            
+            // Kahn's algorithm queue for structural topological sorting
+            queue<string> q;
+            for(auto& [id, indegree] : inDegrees) {
+                if(indegree == 0) {
+                    q.push(id);
+                }
+            }
+            
+            // Explicitly set the seed point for the true start path
+            if (dp.find(startNode) != dp.end()) {
+                dp[startNode] = nodePoints[startNode];
+            }
+            
+            while(!q.empty()) {
+                string node = q.front();
+                q.pop();
+                
+                // Only propagate scores if the current node itself is reachable from START
+                if (dp[node] != -1e9) {
+                    for(auto& [adjNode, edgeWeight] : adjacencyList[node]) {
+                        int possibleScore = dp[node] + nodePoints[adjNode] - edgeWeight;
+                        if(possibleScore > dp[adjNode]) {
+                            dp[adjNode] = possibleScore;
+                            parent[adjNode] = node;
+                        }
+                    }
+                }
+                
+                // In-degree decrement must happen independently of reachability 
+                // to preserve correct topological processing orders downstream
+                for(auto& [adjNode, edgeWeight] : adjacencyList[node]) {
+                    inDegrees[adjNode]--;
+                    if(inDegrees[adjNode] == 0) {
+                        q.push(adjNode);
+                    }
+                }
+            }
+            
+            // Identify the optimal finish checkpoint (explicitly filtering for "END" nodes)
+            int bestScore = -1e9;
+            string bestEnd = "";
+            for(auto& p : nodePoints) {
+                // Defensive check: must be a terminal node and explicitly prefixed with "END"
+                if(p.first.starts_with("END")) { 
+                    if (dp[p.first] > bestScore) {
+                        bestScore = dp[p.first];
+                        bestEnd = p.first;
+                    }
+                }
+            }
+            
+            // Reconstruct path from the selected terminal point back to START
+            vector<string> path;
+            if (bestEnd.empty() || dp[bestEnd] == -1e9) {
+                return path; // Return empty vector if no valid path exists
+            }
+            
+            for(string curr = bestEnd; curr != ""; curr = parent[curr]) {
+                path.push_back(curr);
+            }       
+            reverse(path.begin(), path.end()); // Reverse to get START -> END order
+            return path;     
+        }
+}; // Fixed missing semicolon syntax error
+
+int main() {
+    unordered_map<string, int> nodePoints = {
+        {"START", 0}, {"A", 24}, {"B", 3}, {"C", 10}, 
+        {"D", 7}, {"E", 24}, {"F", 3}, {"END_1", 4}, {"END_2", 7}
+    };
+    
+    vector<vector<string>> paths = {
+        {"START", "A", "5"}, {"START", "B", "6"}, {"START", "C", "10"},
+        {"A", "D", "4"}, {"B", "D", "5"}, {"C", "D", "6"}, {"C", "E", "5"},
+        {"D", "F", "3"}, {"E", "F", "1"}, {"F", "END_1", "5"}, {"F", "END_2", "10"}
+    };
+
+    SkiTournamentPathFinder solver;
+    vector<string> optimalPath = solver.find(nodePoints, paths);
+
+    cout << "Optimal Path: ";
+    for (const string& node : optimalPath) {
+        cout << node << " ";
+    }
+    cout << endl;
+    return 0;
+}
+```
