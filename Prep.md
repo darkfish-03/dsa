@@ -4144,3 +4144,153 @@ int main() {
     return 0;
 }
 ```
+
+Tag Words
+
+```
+#include <cmath>
+#include <cstdio>
+#include <numeric>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <queue>
+#include <unordered_map>
+using namespace std;
+
+struct Node {
+     unordered_map<string, Node*> links;
+     string tag;
+     bool isEnd;
+     
+     bool containsKey(string word) {
+        return links.count(word);
+     }
+     
+     Node* get(string word) {
+        return links[word];
+     }
+     
+     void putKey(string word, Node* node) {
+        links[word] = node;
+     }
+     
+     void setTag(string word) {
+        tag = word;
+     }
+     
+     void setEnd() {
+        tag = true;
+     }
+     
+     string getTag() {
+        return tag;
+     }
+     
+     bool isEnd() {
+        return isEnd;
+     }
+};
+
+class WordTrie {
+    
+    private:
+        Node* root;
+        
+        void toLower(string& s) {
+            for(auto& ch: s) {
+                tolower(ch);
+            }
+        }
+        
+    public:
+        WordTrie() {
+            root = new Node();
+        }
+        
+        void insert(string phrase, string tag) {
+            Node* curr = root;
+            stringstream ss(phrase)
+            string word;
+            for(ss >> word) {
+                if(!curr->containsKey(word)) {
+                   curr.putKey(word, new Node()); 
+                }
+                curr = curr.get(word);
+            }
+            curr->setTag(tag);
+            curr->setEnd();
+        }
+        
+        pair<string, int> findBestMatch(vector<string> tokens, int start) {
+            Node* curr = root;
+            pair<string, int> bestMatch = {"", 0};
+            for(int ind=start; ind<tokens.size();ind++) {
+                if(!isalnum(tokens[ind][0])) {
+                    continue;
+                }
+                // to lower
+                if(!root.containsKey(token[i])) {
+                    break;
+                }
+                curr = curr->get(token[i]);
+                if(curr->isEnd()) {
+                    bestMatch = {curr->getTag(), (i-start)+1};
+                }
+                
+            }
+            return best;
+        }
+};
+
+class Replacer {
+    public:
+        string replace(string review, unordered_map<string, string> tags) {
+            WordTrie trie;
+            for(auto& [word, tag] : tags) {
+                trie.insert(word, tag);
+            }
+            vector<string> tokens;
+            
+            string temp = "";
+            for(auto& ch : review) {
+                if(isalnum(ch)) {
+                    temp += ch;
+                } else {
+                    if(!temp.empty()) {
+                        tokens.push_back(temp);
+                        temp = "";
+                    }
+                    tokens.push_back(string(1, ch));
+                }
+            }
+            
+            if(!temp.empty()) {
+                tokens.push_back(temp);
+            }
+            
+            string res = "";
+            for(int ind =0; ind<tokens.size();) {
+                if(isalnum(tokens[ind][0])) {
+                    auto [tag, count] = trie.findBestMatch(tokens, ind);
+                    if(count > 0) {
+                        res += "[" + tag + "]{";
+                        for(int i=0 ;i<count; i++) {
+                           res +=  tokens[ind + i];
+                        }
+                        res += "}";
+                        ind = ind + count;
+                        continue;
+                    }
+                }
+                res+= tokens[i++];
+            }
+            return res;
+        }
+}
+
+int main() {
+    
+    return 0;
+}
+```
