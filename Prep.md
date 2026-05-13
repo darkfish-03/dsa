@@ -3929,3 +3929,88 @@ int main() {
 	I will implement this using a 2D DP matrix first. This will make the solution reconstruction via backtracking very clear and easier to verify for correctness. The space complexity will be \(\mathcal{O}(N \times C)\). Once this is fully working, if we have time, I can optimize it to a 1D vector to bring the space complexity down to \(\mathcal{O}(C)\)."
 }
 ```
+
+```
+#include <cmath>
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+#include <unordered_map>
+using namespace std;
+
+struct MenuItem {
+    double price;
+    vector<string> items;
+};
+
+class MenuFinder {
+public: // FIX 1: Must be public to call from main()
+    double find(vector<string> needs, vector<MenuItem> menu) { // FIX 2: Return double instead of int
+        
+        unordered_map<string, int> needBitPositionMap;
+        int bitPos = 0;
+        
+        for(auto& neededItem : needs) {
+            needBitPositionMap[neededItem] = bitPos++;
+        }
+        
+        int totalNeededItems = needs.size();
+        if (totalNeededItems == 0) return 0.0;
+        
+        // FIX 3: Added parentheses to handle operator precedence correctly
+        int target = (1 << totalNeededItems) - 1; 
+        
+        vector<pair<int, double>> offers;
+        
+        for(auto& menuItem : menu) {
+            int mask = 0;
+            for(auto& item: menuItem.items) {
+                // FIX 4: Only map items that the user actually requested
+                if (needBitPositionMap.count(item)) {
+                    mask |= (1 << needBitPositionMap[item]);
+                }
+            }
+            if(mask > 0) {
+                offers.push_back({mask, menuItem.price});
+            }
+        }
+        
+        vector<double> dp(1 << totalNeededItems, 1e9);
+        dp[0] = 0;
+        
+        // FIX 5: Loop through all possible states up to total size to handle combinations correctly
+        for(int mask = 0; mask < (1 << totalNeededItems); mask++) {
+            if (dp[mask] == 1e9) continue;
+            for(auto& offer : offers) {
+                int newMask = mask | offer.first;
+                dp[newMask] = min(dp[newMask], dp[mask] + offer.second);
+            }
+        }
+        
+        return (dp[target] == 1e9) ? -1.0 : dp[target];
+    }
+}; // FIX 6: Added missing semicolon
+
+int main() {
+    MenuFinder finder;
+    
+    vector<MenuItem> menu = {
+        {5.00, {"pizza"}},
+        {8.00, {"sandwich", "coke"}},
+        {4.00, {"pasta"}},
+        {2.00, {"coke"}},
+        {6.00, {"pasta", "coke", "pizza"}},
+        {8.00, {"burger", "coke", "pizza"}},
+        {5.00, {"sandwich"}}
+    };
+    
+    vector<string> user_wants = {"burger", "pasta"};
+    
+    double price = finder.find(user_wants, menu);
+    cout << "Best Price: " << price << endl; // Outputs 12
+    
+    return 0;
+}
+
+```
